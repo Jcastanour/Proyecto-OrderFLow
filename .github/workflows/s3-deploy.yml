@@ -1,0 +1,83 @@
+# =============================================================================
+# OrderFlow · Deploy frontend estático a Amazon S3
+# -----------------------------------------------------------------------------
+# Sube todo el contenido de frontend/ al bucket configurado y (opcionalmente)
+# invalida la caché de CloudFront.
+#
+# Secrets requeridos en el repositorio (Settings > Secrets and variables > Actions):
+#   - AWS_ACCESS_KEY_ID          Credencial del usuario IAM de despliegue
+#   - AWS_SECRET_ACCESS_KEY      Credencial del usuario IAM de despliegue
+#   - AWS_REGION                 Ej. us-east-1
+#   - S3_BUCKET                  Ej. orderflow-site
+#
+# Secrets opcionales (si se usa CloudFront):
+#   - CLOUDFRONT_DISTRIBUTION_ID Ej. E3ABCDEF1GHIJ
+#
+# Política IAM mínima sugerida para el usuario de despliegue:
+#   s3:ListBucket sobre arn:aws:s3:::orderflow-site
+#   s3:PutObject, s3:DeleteObject, s3:GetObject sobre arn:aws:s3:::orderflow-site/*
+#   cloudfront:CreateInvalidation sobre la distribución (si aplica)
+# =============================================================================
+
+name: Deploy frontend to S3
+
+# Solo se dispara manualmente desde la pestaña "Actions" hasta que los
+# secrets de AWS estén configurados. Cuando estén listos, descomentar
+# el bloque `push` de abajo para reactivar el deploy automático.
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - 'frontend/**'
+  #     - '.github/workflows/s3-deploy.yml'
+
+concurrency:
+  group: s3-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciales AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ secrets.AWS_REGION }}
+
+      # Assets con hash-friendly headers (fuentes, imágenes, scripts, estilos)
+      # Duran mucho en caché porque los HTML siempre traen referencias frescas.
+      - name: Sincronizar assets cacheables (css, js, img, fuentes)
+        run: |
+          aws s3 sync frontend/ s3://${{ secrets.S3_BUCKET }}/ \
+            --delete \
+            --exclude "*.html" \
+            --cache-control "public, max-age=86400, must-revalidate"
+
+      # HTML: nunca cachear (para que los cambios se vean al tiro).
+      - name: Sincronizar HTML sin caché
+        run: |
+          aws s3 sync frontend/ s3://${{ secrets.S3_BUCKET }}/ \
+            --exclude "*" \
+            --include "*.html" \
+            --cache-control "no-cache, no-store, must-revalidate" \
+            --content-type "text/html; charset=utf-8"
+
+      # Invalidar CloudFront si existe la distribución
+      - name: Invalidar CloudFront (opcional)
+        if: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID != '' }}
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+
+      - name: Resumen
+        run: |
+          echo "✅ Deploy completado en s3://${{ secrets.S3_BUCKET }}/"
+          echo "Archivos sincronizados desde frontend/"

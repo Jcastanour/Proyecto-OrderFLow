@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Ilustración: Bandeja Paisa">
+  <defs>
+    <radialGradient id="bg-bp" cx="30%" cy="25%" r="90%">
+      <stop offset="0%" stop-color="#f4b738"/>
+      <stop offset="55%" stop-color="#e85d1c"/>
+      <stop offset="100%" stop-color="#7a2e0a"/>
+    </radialGradient>
+    <radialGradient id="plato-bp" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#fdf6e8"/>
+      <stop offset="100%" stop-color="#e9d9b3"/>
+    </radialGradient>
+    <filter id="g-bp" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="0.6"/>
+    </filter>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg-bp)"/>
+  <!-- viñeta -->
+  <circle cx="120" cy="120" r="260" fill="#fff" opacity="0.08"/>
+  <circle cx="720" cy="520" r="340" fill="#000" opacity="0.18"/>
+
+  <!-- Plato -->
+  <circle cx="400" cy="320" r="220" fill="#0000" stroke="#1b1714" stroke-width="3" opacity="0.12"/>
+  <circle cx="400" cy="320" r="210" fill="url(#plato-bp)"/>
+
+  <!-- Frijol rojo (mitad izq) -->
+  <path d="M 210 260 q 60 -70 170 -50 q 70 15 85 70 q 15 55 -20 90 q -55 55 -135 45 q -90 -10 -115 -65 q -25 -55 15 -90 z"
+        fill="#7a2e0a" opacity="0.95"/>
+  <g opacity="0.9">
+    <ellipse cx="250" cy="280" rx="10" ry="7" fill="#b9400d" transform="rotate(-20 250 280)"/>
+    <ellipse cx="285" cy="265" rx="10" ry="7" fill="#b9400d" transform="rotate(-30 285 265)"/>
+    <ellipse cx="325" cy="258" rx="10" ry="7" fill="#b9400d" transform="rotate(-10 325 258)"/>
+    <ellipse cx="275" cy="310" rx="10" ry="7" fill="#b9400d" transform="rotate(20 275 310)"/>
+    <ellipse cx="315" cy="300" rx="10" ry="7" fill="#b9400d" transform="rotate(-5 315 300)"/>
+    <ellipse cx="355" cy="285" rx="10" ry="7" fill="#b9400d" transform="rotate(25 355 285)"/>
+    <ellipse cx="240" cy="320" rx="10" ry="7" fill="#b9400d" transform="rotate(40 240 320)"/>
+    <ellipse cx="295" cy="345" rx="10" ry="7" fill="#b9400d" transform="rotate(-15 295 345)"/>
+    <ellipse cx="340" cy="330" rx="10" ry="7" fill="#b9400d" transform="rotate(5 340 330)"/>
+  </g>
+
+  <!-- Arroz blanco (mitad sup derecha) -->
+  <path d="M 400 180 q 80 -20 150 20 q 55 35 55 95 q -5 10 -35 10 q -80 0 -140 -45 q -40 -30 -30 -80 z"
+        fill="#fdfbef"/>
+  <g fill="#d7c89b" opacity="0.85" filter="url(#g-bp)">
+    <ellipse cx="455" cy="205" rx="5" ry="2"/>
+    <ellipse cx="490" cy="220" rx="5" ry="2" transform="rotate(15 490 220)"/>
+    <ellipse cx="525" cy="240" rx="5" ry="2" transform="rotate(-10 525 240)"/>
+    <ellipse cx="480" cy="255" rx="5" ry="2" transform="rotate(30 480 255)"/>
+    <ellipse cx="515" cy="270" rx="5" ry="2"/>
+    <ellipse cx="545" cy="260" rx="5" ry="2" transform="rotate(-20 545 260)"/>
+    <ellipse cx="560" cy="230" rx="5" ry="2" transform="rotate(45 560 230)"/>
+  </g>
+
+  <!-- Chicharrón (abajo derecha) -->
+  <path d="M 420 380 q 80 -30 150 10 q 40 25 20 70 q -25 45 -90 40 q -70 -5 -95 -45 q -20 -40 15 -75 z"
+        fill="#b9400d"/>
+  <path d="M 430 395 q 70 -20 130 10 q 30 18 15 52 q -20 33 -75 28 q -60 -5 -80 -38 q -14 -30 10 -52 z"
+        fill="#e85d1c"/>
+  <g stroke="#7a2e0a" stroke-width="3" fill="none" opacity="0.7">
+    <path d="M 460 420 l 20 -6"/>
+    <path d="M 495 425 l 22 -4"/>
+    <path d="M 530 435 l 18 0"/>
+    <path d="M 475 455 l 25 -3"/>
+    <path d="M 515 460 l 20 -2"/>
+  </g>
+
+  <!-- Huevo frito -->
+  <ellipse cx="265" cy="415" rx="55" ry="42" fill="#fdfbef"/>
+  <circle cx="265" cy="412" r="22" fill="#f4b738"/>
+  <circle cx="258" cy="405" r="6" fill="#ffe29a" opacity="0.7"/>
+
+  <!-- Tajada madura -->
+  <path d="M 150 340 q 45 -25 95 -10 q 30 10 25 45 q -6 40 -55 42 q -55 2 -80 -30 q -18 -27 15 -47 z"
+        fill="#f4b738"/>
+  <path d="M 165 348 q 35 -16 75 -6 q 22 7 18 35 q -4 28 -42 30 q -40 2 -58 -22 q -12 -20 7 -37 z"
+        fill="#e0a026"/>
+
+  <!-- Grano textura overlay -->
+  <rect width="800" height="600" fill="#000" opacity="0.04"/>
+</svg>

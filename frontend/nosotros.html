@@ -1,153 +1,129 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nosotros - OrderFlow</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="description" content="OrderFlow — la evolución del domicilio en Colombia. Plataforma serverless que le devuelve el control a los restaurantes de barrio.">
+    <title>Nosotros · OrderFlow</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Geist:wght@300..700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="assets/styles/tokens.css">
+    <link rel="stylesheet" href="assets/styles/app.css">
 </head>
+<body>
 
-<body class="bg-[#fdfbf9] min-h-screen text-gray-800 font-sans pb-24 md:pb-10">
-
-    <!-- Navbar -->
-    <nav class="bg-white p-4 shadow-sm border-b border-orange-100 sticky top-0 z-50">
-        <div class="container mx-auto max-w-5xl flex justify-between items-center px-4">
-            <h1 class="text-2xl font-black tracking-tighter text-orange-600">🥘 Order<span
-                    class="text-gray-800">Flow</span></h1>
-            <div class="hidden md:flex space-x-8 text-sm font-semibold text-gray-400 tracking-wide">
-                <a href="index.html" class="hover:text-gray-800 transition">MENÚ</a>
-                <a href="nosotros.html" class="text-orange-600 pb-1 border-b-2 border-orange-600">NOSOTROS 🇨🇴</a>
-                <a href="logistica.html" class="hover:text-amber-600 transition">LOGÍSTICA</a>
-            </div>
-            <div class="bg-orange-100 p-2 rounded-full cursor-pointer hover:bg-orange-200 transition">
-                <span class="text-xl">🧑‍🍳</span>
-            </div>
+    <header class="nav-top">
+        <div class="contenedor nav-top__fila">
+            <a href="index.html" class="marca" style="text-decoration:none; color:var(--carbon);">
+                Order<span class="marca__acento">Flow</span><span class="marca__punto"></span>
+            </a>
+            <nav class="nav-enlaces">
+                <a href="index.html">Menú</a>
+                <a href="nosotros.html" class="activo">Nosotros</a>
+                <a href="logistica.html">Logística</a>
+            </nav>
+            <a href="index.html" class="pill-carrito" style="background:var(--brasa-humo); color:var(--brasa-hondo);">
+                <span aria-hidden="true">🧑‍🍳</span>
+                <span>Pedir ahora</span>
+            </a>
         </div>
-    </nav>
+    </header>
 
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 mt-8 max-w-5xl">
+    <main class="contenedor" style="padding-top:48px; padding-bottom:80px;">
 
-        <!-- Hero Section (Impactante) -->
-        <div
-            class="bg-orange-500 rounded-3xl p-8 md:p-16 text-center text-white shadow-xl mb-12 relative overflow-hidden">
-            <!-- Elementos decorativos de fondo -->
-            <div class="absolute -top-20 -right-20 w-64 h-64 bg-orange-400 rounded-full blur-3xl opacity-50"></div>
-            <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-orange-600 rounded-full blur-3xl opacity-50"></div>
+        <!-- Manifiesto (hero) -->
+        <section class="hero-manifiesto grano">
+            <span class="kicker" style="background:rgba(255,255,255,0.18); color:#ffe7c2; border-color:rgba(255,231,194,0.3);">
+                Nuestra misión
+            </span>
+            <h2 style="margin-top:18px;">La evolución del <em>domicilio</em> en Colombia <span aria-hidden="true">🇨🇴</span></h2>
+            <p>
+                Devolviéndole el control a los asaderos, corrientazos y restaurantes de barrio —
+                librándolos de las comisiones abusivas extranjeras.
+            </p>
+        </section>
 
-            <!-- Contenido del CTA -->
-            <div class="relative z-10">
-                <span
-                    class="bg-white text-orange-600 font-bold px-4 py-1.5 rounded-full text-xs uppercase tracking-wider mb-6 inline-block shadow-sm">Nuestra
-                    Misión</span>
-                <h2 class="text-4xl md:text-5xl font-black mb-6 tracking-tighter">La Evolución del Domicilio en Colombia
-                    🇨🇴</h2>
-                <p class="text-orange-100 text-lg md:text-xl max-w-2xl mx-auto font-medium leading-relaxed">
-                    Devolviéndole el control a los asaderos, "corrientazos" y restaurantes de barrio, librándolos de las
-                    comisiones abusivas extranjeras.
+        <!-- Problema / Solución -->
+        <section class="dupla">
+            <article class="tarjeta-editorial">
+                <div class="icono" style="background: rgba(195,60,60,0.08); color: var(--salsa);">📉</div>
+                <h3>El problema</h3>
+                <p>
+                    En Colombia la comida es un pilar cultural. Sin embargo, los restaurantes locales
+                    pierden hasta el <strong>30% de sus ganancias</strong> pagando comisiones a apps
+                    de delivery tradicionales. Además, pierden el rastro y el control total sobre
+                    la logística de sus propios envíos.
                 </p>
-            </div>
-        </div>
+            </article>
 
-        <!-- Grid de 2 Columnas (Problema / Solución) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <!-- El Problema -->
-            <div class="bg-white p-8 rounded-3xl shadow-sm border border-orange-50 hover:shadow-md transition">
-                <div
-                    class="w-14 h-14 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-sm">
-                    📉</div>
-                <h3 class="text-2xl font-extrabold text-gray-800 mb-4">El Problema</h3>
-                <p class="text-gray-500 leading-relaxed">
-                    En Colombia la comida es un pilar cultural. Sin embargo, los restaurantes locales pierden hasta el
-                    <strong>30% de sus ganancias</strong> pagando comisiones a apps de delivery tradicionales. Además,
-                    pierden el rastro y el control total sobre la logística de sus propios envíos.
+            <article class="tarjeta-editorial">
+                <div class="icono" style="background: rgba(79,138,62,0.12); color: var(--cilantro);">💡</div>
+                <h3>La solución: OrderFlow</h3>
+                <p>
+                    Nacimos como una plataforma ultra-rápida. El cliente pide directamente al
+                    restaurante y este gestiona la cocción en tiempo real mediante nuestro
+                    <strong>Panel Kanban Logístico</strong>, recuperando el control y el 100%
+                    de sus ingresos.
                 </p>
-            </div>
+            </article>
+        </section>
 
-            <!-- La Solución -->
-            <div class="bg-white p-8 rounded-3xl shadow-sm border border-orange-50 hover:shadow-md transition">
-                <div
-                    class="w-14 h-14 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center text-2xl mb-6 shadow-sm">
-                    💡</div>
-                <h3 class="text-2xl font-extrabold text-gray-800 mb-4">La Solución: OrderFlow</h3>
-                <p class="text-gray-500 leading-relaxed">
-                    Nacimos como una plataforma ultra-rápida. El cliente pide directamente al restaurante y este
-                    gestiona la cocción en tiempo real mediante nuestro <strong>Panel Kanban Logístico</strong>,
-                    recuperando el control y el 100% de sus ingresos.
-                </p>
-            </div>
-        </div>
-
-        <!-- Sección Dark Mode: La Magia Tecnologica (AWS) -->
-        <div class="bg-gray-900 rounded-3xl p-8 md:p-12 text-white shadow-2xl mb-12">
-            <h3 class="text-3xl font-black mb-8 text-center tracking-tight text-orange-400">🔌 La Magia Tecnológica (AWS
-                Serverless)</h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Beneficio 1 -->
-                <div
-                    class="bg-gray-800 p-6 rounded-2xl border border-gray-700 hover:bg-gray-700 transition cursor-default">
-                    <span class="text-4xl mb-4 block">💸</span>
-                    <h4 class="font-bold text-lg text-gray-100 mb-2">Costo Exacto</h4>
-                    <p class="text-sm text-gray-400 leading-relaxed">
-                        Si a las 3:00 AM nadie pide una Arepa, mantener el backend encendido nos cuesta <strong>$0
-                            pesos</strong>. Nuestras funciones <em>AWS Lambda</em> simplemente duermen.
+        <!-- Magia AWS -->
+        <section class="bloque-oscuro">
+            <h3>🔌 La magia tecnológica <em style="font-style:italic; color:#ffd39b;">(AWS Serverless)</em></h3>
+            <div class="trio">
+                <div class="feature">
+                    <span class="feature__emoji">💸</span>
+                    <h4 class="feature__titulo">Costo exacto</h4>
+                    <p class="feature__texto">
+                        Si a las 3:00 AM nadie pide una arepa, mantener el backend encendido nos cuesta
+                        <strong>$0 pesos</strong>. Nuestras funciones <em>AWS Lambda</em> simplemente duermen.
                     </p>
                 </div>
-
-                <!-- Beneficio 2 -->
-                <div
-                    class="bg-gray-800 p-6 rounded-2xl border border-gray-700 hover:bg-gray-700 transition cursor-default">
-                    <span class="text-4xl mb-4 block">📈</span>
-                    <h4 class="font-bold text-lg text-gray-100 mb-2">Resiliencia Nube</h4>
-                    <p class="text-sm text-gray-400 leading-relaxed">
-                        Si en pleno Día de de las madres estallan los pedidos, <em>API Gateway</em> y <em>DynamoDB</em>
-                        se clonan solos en milisegundos para no colapsar nunca.
+                <div class="feature">
+                    <span class="feature__emoji">📈</span>
+                    <h4 class="feature__titulo">Resiliencia nube</h4>
+                    <p class="feature__texto">
+                        Si en pleno Día de la Madre estallan los pedidos, <em>API Gateway</em> y
+                        <em>DynamoDB</em> se clonan solos en milisegundos para no colapsar nunca.
                     </p>
                 </div>
-
-                <!-- Beneficio 3 -->
-                <div
-                    class="bg-gray-800 p-6 rounded-2xl border border-gray-700 hover:bg-gray-700 transition cursor-default">
-                    <span class="text-4xl mb-4 block">📨</span>
-                    <h4 class="font-bold text-lg text-gray-100 mb-2">Desacople Asíncrono</h4>
-                    <p class="text-sm text-gray-400 leading-relaxed">
-                        Logística fluida usando <em>Amazon SQS y SNS</em>. Aseguramos notificaciones ininterrumpidas de
-                        tu repartidor sin congelar tu pantalla principal.
+                <div class="feature">
+                    <span class="feature__emoji">📨</span>
+                    <h4 class="feature__titulo">Desacople asíncrono</h4>
+                    <p class="feature__texto">
+                        Logística fluida usando <em>Amazon SQS y SNS</em>. Aseguramos notificaciones
+                        ininterrumpidas de tu repartidor sin congelar tu pantalla principal.
                     </p>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- El Discurso / Resumen Pitch -->
-        <blockquote class="bg-orange-50 border-l-8 border-orange-500 p-6 md:p-10 rounded-r-3xl mb-12 shadow-sm">
-            <h4 class="font-bold text-orange-900 mb-2 uppercase tracking-widest text-xs">El "Elevator Pitch" 📣</h4>
-            <p class="text-lg md:text-xl text-orange-800 font-medium italic leading-relaxed">
-                "¿Sabían que el 40% de las ganancias de un asadero se quedan en comisiones extranjeras? OrderFlow es una
-                solución omnicanal diseñada en Colombia usando AWS Serverless. El restaurante recupera su negocio, y la
-                nube gestiona el trabajo pesado por centavos de dólar al día."
+        <!-- Pitch -->
+        <blockquote class="cita">
+            <div class="cita__kicker">El "elevator pitch" 📣</div>
+            <p>
+                "¿Sabían que el 40% de las ganancias de un asadero se quedan en comisiones extranjeras?
+                OrderFlow es una solución omnicanal diseñada en Colombia usando AWS Serverless.
+                El restaurante recupera su negocio, y la nube gestiona el trabajo pesado
+                por centavos de dólar al día."
             </p>
         </blockquote>
-
     </main>
 
-    <!-- Mobile Bottom Navbar (App-like) -->
-    <nav class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 z-50 flex justify-around items-center pt-2 pb-6 shadow-[0_-5px_15px_-3px_rgba(0,0,0,0.05)]">
-        <a href="index.html" class="flex flex-col items-center text-gray-400 hover:text-gray-800 transition">
-            <span class="text-xl mb-0.5">🍔</span>
-            <span class="text-[10px] font-bold tracking-wider">MENÚ</span>
-        </a>
-        <a href="nosotros.html" class="flex flex-col items-center text-orange-600 transition">
-            <span class="text-xl mb-0.5">🇨🇴</span>
-            <span class="text-[10px] font-bold tracking-wider">NOSOTROS</span>
-        </a>
-        <a href="logistica.html" class="flex flex-col items-center text-gray-400 hover:text-gray-800 transition">
-            <span class="text-xl mb-0.5">🛵</span>
-            <span class="text-[10px] font-bold tracking-wider">DESPACHO</span>
-        </a>
+    <!-- Nav móvil inferior -->
+    <nav class="nav-movil">
+        <a href="index.html"><span class="emoji">🍔</span>Menú</a>
+        <a href="nosotros.html" class="activo"><span class="emoji">🇨🇴</span>Nosotros</a>
+        <a href="logistica.html"><span class="emoji">🛵</span>Despacho</a>
     </nav>
-</body>
 
+    <style>
+        body { padding-bottom: 96px; }
+        @media (min-width: 768px) { body { padding-bottom: 40px; } }
+    </style>
+</body>
 </html>

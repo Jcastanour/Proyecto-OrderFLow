@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Ilustración: Arepa de chócolo con quesito">
+  <defs>
+    <radialGradient id="bg-ar" cx="30%" cy="30%" r="90%">
+      <stop offset="0%" stop-color="#ffe07a"/>
+      <stop offset="55%" stop-color="#f4b738"/>
+      <stop offset="100%" stop-color="#4f8a3e"/>
+    </radialGradient>
+    <radialGradient id="arepa-g" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#ffe29a"/>
+      <stop offset="60%" stop-color="#e8b238"/>
+      <stop offset="100%" stop-color="#8a5a0f"/>
+    </radialGradient>
+    <radialGradient id="queso-g" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#fffbea"/>
+      <stop offset="60%" stop-color="#fff1c2"/>
+      <stop offset="100%" stop-color="#e8c86a"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg-ar)"/>
+  <circle cx="140" cy="120" r="220" fill="#fff" opacity="0.12"/>
+  <circle cx="700" cy="540" r="320" fill="#1b1714" opacity="0.2"/>
+
+  <!-- Hoja de plátano base -->
+  <ellipse cx="400" cy="360" rx="320" ry="180" fill="#4f8a3e"/>
+  <ellipse cx="400" cy="360" rx="305" ry="170" fill="#3d7030"/>
+  <path d="M 120 360 L 680 360" stroke="#2b5020" stroke-width="4" opacity="0.7"/>
+  <g stroke="#2b5020" stroke-width="1.5" opacity="0.5">
+    <path d="M 400 360 L 200 280" />
+    <path d="M 400 360 L 200 440" />
+    <path d="M 400 360 L 600 280" />
+    <path d="M 400 360 L 600 440" />
+    <path d="M 400 360 L 280 250" />
+    <path d="M 400 360 L 280 470" />
+    <path d="M 400 360 L 520 250" />
+    <path d="M 400 360 L 520 470" />
+  </g>
+
+  <!-- Arepa base -->
+  <ellipse cx="400" cy="370" rx="210" ry="160" fill="#000" opacity="0.25"/>
+  <ellipse cx="400" cy="360" rx="210" ry="160" fill="url(#arepa-g)"/>
+  <ellipse cx="400" cy="350" rx="185" ry="140" fill="#f4b738" opacity="0.5"/>
+
+  <!-- Granos de maíz (textura) -->
+  <g fill="#ffdf82" opacity="0.85">
+    <circle cx="320" cy="310" r="6"/>
+    <circle cx="340" cy="300" r="5"/>
+    <circle cx="360" cy="305" r="6"/>
+    <circle cx="380" cy="295" r="5"/>
+    <circle cx="400" cy="300" r="6"/>
+    <circle cx="420" cy="295" r="5"/>
+    <circle cx="440" cy="305" r="6"/>
+    <circle cx="460" cy="300" r="5"/>
+    <circle cx="310" cy="340" r="5"/>
+    <circle cx="330" cy="345" r="6"/>
+    <circle cx="350" cy="340" r="5"/>
+    <circle cx="470" cy="340" r="5"/>
+    <circle cx="450" cy="345" r="6"/>
+    <circle cx="430" cy="340" r="5"/>
+    <circle cx="320" cy="380" r="6"/>
+    <circle cx="350" cy="390" r="5"/>
+    <circle cx="380" cy="395" r="6"/>
+    <circle cx="410" cy="390" r="5"/>
+    <circle cx="440" cy="380" r="6"/>
+    <circle cx="470" cy="390" r="5"/>
+  </g>
+
+  <!-- Manchas tostadas -->
+  <g fill="#8a5a0f" opacity="0.35">
+    <ellipse cx="260" cy="320" rx="25" ry="10" transform="rotate(-15 260 320)"/>
+    <ellipse cx="540" cy="380" rx="30" ry="12" transform="rotate(10 540 380)"/>
+    <ellipse cx="380" cy="450" rx="40" ry="14" transform="rotate(-5 380 450)"/>
+  </g>
+
+  <!-- Quesito derretido -->
+  <path d="M 240 310 q 40 -70 140 -55 q 100 15 150 -10 q 40 -20 80 10 q 35 25 5 70 q -25 40 -110 55 q -110 20 -180 -5 q -85 -28 -110 -45 q -20 -15 25 -20 z"
+        fill="url(#queso-g)" opacity="0.96"/>
+  <!-- Gotitas de queso cayendo -->
+  <path d="M 260 390 q 10 40 -5 60 q -15 20 -20 -5 q -3 -28 25 -55 z" fill="#fff1c2" opacity="0.9"/>
+  <path d="M 560 395 q 8 30 -8 50 q -14 15 -17 -8 q -1 -22 25 -42 z" fill="#fff1c2" opacity="0.9"/>
+  <path d="M 420 430 q 4 18 -6 28 q -10 8 -13 -6 q -1 -14 19 -22 z" fill="#fff1c2" opacity="0.9"/>
+
+  <!-- Brillo -->
+  <ellipse cx="340" cy="280" rx="40" ry="14" fill="#ffffff" opacity="0.35"/>
+
+  <rect width="800" height="600" fill="#000" opacity="0.04"/>
+</svg>

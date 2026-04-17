@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Ilustración: Salchipapa salvaje">
+  <defs>
+    <radialGradient id="bg-sp" cx="70%" cy="30%" r="90%">
+      <stop offset="0%" stop-color="#ffd06a"/>
+      <stop offset="50%" stop-color="#e85d1c"/>
+      <stop offset="100%" stop-color="#5a1404"/>
+    </radialGradient>
+    <linearGradient id="papa-g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe08a"/>
+      <stop offset="55%" stop-color="#e8a128"/>
+      <stop offset="100%" stop-color="#8a4a0a"/>
+    </linearGradient>
+    <linearGradient id="salchicha-g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e85a5a"/>
+      <stop offset="60%" stop-color="#c33c3c"/>
+      <stop offset="100%" stop-color="#6a1414"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg-sp)"/>
+  <circle cx="130" cy="130" r="230" fill="#fff" opacity="0.12"/>
+  <circle cx="700" cy="540" r="300" fill="#1b1714" opacity="0.22"/>
+
+  <!-- Bandeja/cono de papel encerado -->
+  <path d="M 150 240 L 650 240 L 620 560 L 180 560 Z" fill="#fdfbef" opacity="0.95"/>
+  <path d="M 170 260 L 630 260 L 605 540 L 195 540 Z" fill="#f5ecd0"/>
+  <g stroke="#c33c3c" stroke-width="4" opacity="0.5">
+    <line x1="220" y1="290" x2="260" y2="290"/>
+    <line x1="340" y1="290" x2="400" y2="290"/>
+    <line x1="480" y1="290" x2="540" y2="290"/>
+    <line x1="220" y1="330" x2="280" y2="330"/>
+    <line x1="380" y1="330" x2="440" y2="330"/>
+    <line x1="500" y1="330" x2="560" y2="330"/>
+  </g>
+
+  <!-- Pila de papas fritas -->
+  <g>
+    <!-- Columna 1 -->
+    <rect x="220" y="320" width="34" height="210" rx="10" fill="url(#papa-g)" transform="rotate(-8 237 425)"/>
+    <rect x="270" y="310" width="34" height="220" rx="10" fill="url(#papa-g)" transform="rotate(4 287 420)"/>
+    <rect x="320" y="305" width="34" height="225" rx="10" fill="url(#papa-g)" transform="rotate(-3 337 418)"/>
+    <rect x="370" y="300" width="34" height="230" rx="10" fill="url(#papa-g)" transform="rotate(6 387 415)"/>
+    <rect x="420" y="310" width="34" height="220" rx="10" fill="url(#papa-g)" transform="rotate(-5 437 420)"/>
+    <rect x="470" y="318" width="34" height="212" rx="10" fill="url(#papa-g)" transform="rotate(3 487 424)"/>
+    <rect x="520" y="325" width="34" height="205" rx="10" fill="url(#papa-g)" transform="rotate(-7 537 427)"/>
+    <!-- Papas transversales (encima) -->
+    <rect x="240" y="280" width="34" height="200" rx="10" fill="url(#papa-g)" transform="rotate(74 257 380)" opacity="0.96"/>
+    <rect x="350" y="260" width="34" height="210" rx="10" fill="url(#papa-g)" transform="rotate(98 367 365)" opacity="0.96"/>
+    <rect x="470" y="280" width="34" height="200" rx="10" fill="url(#papa-g)" transform="rotate(68 487 380)" opacity="0.96"/>
+  </g>
+
+  <!-- Salchichas ahumadas en rodajas -->
+  <g>
+    <g transform="translate(280 460)">
+      <ellipse cx="0" cy="8" rx="40" ry="10" fill="#1b1714" opacity="0.3"/>
+      <circle r="36" fill="url(#salchicha-g)"/>
+      <circle r="30" fill="#d94848"/>
+      <circle r="6" fill="#7a1414"/>
+    </g>
+    <g transform="translate(400 480)">
+      <ellipse cx="0" cy="8" rx="44" ry="11" fill="#1b1714" opacity="0.3"/>
+      <circle r="40" fill="url(#salchicha-g)"/>
+      <circle r="34" fill="#d94848"/>
+      <circle r="7" fill="#7a1414"/>
+    </g>
+    <g transform="translate(510 460)">
+      <ellipse cx="0" cy="8" rx="36" ry="9" fill="#1b1714" opacity="0.3"/>
+      <circle r="32" fill="url(#salchicha-g)"/>
+      <circle r="26" fill="#d94848"/>
+      <circle r="5" fill="#7a1414"/>
+    </g>
+  </g>
+
+  <!-- Queso costeño rallado (cintillas blancas) -->
+  <g fill="#fdfbef" opacity="0.9">
+    <path d="M 240 360 q 25 -10 50 -3 q 20 6 -2 12 q -30 8 -55 0 q -8 -4 7 -9 z"/>
+    <path d="M 440 350 q 30 -8 55 0 q 18 7 -5 11 q -32 6 -55 -1 q -10 -5 5 -10 z"/>
+    <path d="M 330 400 q 28 -8 54 0 q 18 6 -4 11 q -30 6 -53 -1 q -10 -5 3 -10 z"/>
+  </g>
+
+  <!-- Tocineta crocante (tiritas rizadas) -->
+  <g>
+    <path d="M 300 340 q 40 -20 90 -5 q 50 15 100 -5" stroke="#7a1414" stroke-width="14" fill="none" stroke-linecap="round" opacity="0.95"/>
+    <path d="M 300 340 q 40 -20 90 -5 q 50 15 100 -5" stroke="#e85d1c" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.9"/>
+    <path d="M 280 420 q 35 10 80 0" stroke="#7a1414" stroke-width="10" fill="none" stroke-linecap="round" opacity="0.9"/>
+  </g>
+
+  <!-- Huevos de codorniz -->
+  <g>
+    <ellipse cx="230" cy="380" rx="14" ry="12" fill="#fdfbef"/>
+    <circle cx="230" cy="379" r="5" fill="#f4b738"/>
+    <ellipse cx="590" cy="395" rx="14" ry="12" fill="#fdfbef"/>
+    <circle cx="590" cy="394" r="5" fill="#f4b738"/>
+  </g>
+
+  <!-- Perejil -->
+  <g fill="#4f8a3e" opacity="0.85">
+    <circle cx="360" cy="355" r="3"/>
+    <circle cx="365" cy="361" r="3"/>
+    <circle cx="370" cy="358" r="3"/>
+    <circle cx="470" cy="430" r="3"/>
+    <circle cx="475" cy="434" r="3"/>
+  </g>
+
+  <rect width="800" height="600" fill="#000" opacity="0.04"/>
+</svg>

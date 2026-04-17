@@ -19,12 +19,77 @@ El proyecto se divide en dos macro-componentes fuertemente desacoplados:
 
 ---
 
+## 🗂️ Estructura del Frontend
+```
+frontend/
+├── index.html           · Menú público (landing)
+├── nosotros.html        · Historia + pitch AWS
+├── logistica.html       · Panel Kanban de despacho
+└── assets/
+    ├── styles/
+    │   ├── tokens.css   · Design tokens (paleta, tipografía, sombras)
+    │   └── app.css      · Componentes reutilizables (nav, plato, radar, kanban…)
+    ├── scripts/
+    │   ├── app.js              · Lógica del menú + carrito
+    │   ├── logisticaApp.js     · Lógica del tablero Kanban
+    │   ├── config.js           · Adaptador swap: mock ↔ AWS
+    │   ├── orderMock.js        · Base simulada (dev/demos)
+    │   └── orderAwsAdapter.js  · Fetch real al API Gateway
+    └── img/             · (reservado para imágenes propias)
+```
+
+> **Tipografía:** Fraunces (display) + Geist (body) + JetBrains Mono (mono), vía Google Fonts.
+> **Sistema:** variables CSS en `tokens.css` — cambiar marca/paleta se hace en un solo lugar.
+
 ## 🚀 Instrucciones de Ejecución (Despliegue Local Mock)
-La arquitectura Limpia permite probar la intefaz en milisegundos.
+La arquitectura Limpia permite probar la interfaz en milisegundos.
 1. Clonar el repositorio.
 2. Usar un entorno como la extensión **"Live Server"** en Visual Studio Code para evadir el bloqueo nativo (CORS/File protocols).
-3. Abrir la subcarpeta `frontend/` y ejecutar `index.html`. 
-   *(Nota técnica: Por defecto, la importación del módulo `/js/config.js` inyectará la base simulada `orderMock.js` para pruebas UI instantáneas).*
+3. Abrir la subcarpeta `frontend/` y ejecutar `index.html`.
+   *(Nota técnica: Por defecto, la importación del módulo `/assets/scripts/config.js` inyectará la base simulada `orderMock.js` para pruebas UI instantáneas).*
+
+### 🔌 Pegar el backend AWS cuando esté listo
+Una sola línea de cambio — `frontend/assets/scripts/config.js`:
+```js
+// Cambiar esta línea
+import { OrderAdapter } from './orderMock.js';
+// Por esta
+import { OrderAdapter } from './orderAwsAdapter.js';
+```
+Y editar `orderAwsAdapter.js` con la URL real del API Gateway.
+
+---
+
+## ☁️ Despliegue Frontend
+
+Dos workflows coexisten — uno activo y uno en modo manual:
+
+| Workflow | Estado | Trigger | Uso |
+|---|---|---|---|
+| `.github/workflows/pages.yml` | ✅ **Activo** | push a `main` | Publica el sitio en GitHub Pages automáticamente |
+| `.github/workflows/s3-deploy.yml` | 🟡 **En espera** | manual (`workflow_dispatch`) | Sube a S3 cuando los secrets estén configurados |
+
+### Transición a S3 (cuando esté listo)
+1. Configurar los secrets en *Settings → Secrets and variables → Actions*.
+2. En `s3-deploy.yml`, descomentar el bloque `push:` para activar deploy automático.
+3. En `pages.yml`, renombrarlo a `pages.yml.off` (o borrarlo) para desactivar Pages.
+4. En *Settings → Pages*, poner `Source = None`.
+
+### Secrets requeridos para S3
+| Secret | Descripción |
+|---|---|
+| `AWS_ACCESS_KEY_ID` | Credencial del usuario IAM de despliegue |
+| `AWS_SECRET_ACCESS_KEY` | Credencial del usuario IAM de despliegue |
+| `AWS_REGION` | Ej. `us-east-1` |
+| `S3_BUCKET` | Nombre del bucket (ej. `orderflow-site`) |
+| `CLOUDFRONT_DISTRIBUTION_ID` | *(opcional)* Invalida la caché tras cada deploy |
+
+**Política IAM mínima** del usuario de despliegue:
+- `s3:ListBucket` sobre el bucket
+- `s3:PutObject`, `s3:DeleteObject`, `s3:GetObject` sobre el contenido
+- `cloudfront:CreateInvalidation` (si usas CDN)
+
+El workflow cachea assets (`css/js/img`) por 24h y fuerza `no-cache` en los HTML — los cambios se ven al instante sin romper performance.
 
 ---
 

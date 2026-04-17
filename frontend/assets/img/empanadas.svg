@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Ilustración: Empanadas vallunas">
+  <defs>
+    <linearGradient id="bg-emp" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffc36a"/>
+      <stop offset="60%" stop-color="#e85d1c"/>
+      <stop offset="100%" stop-color="#8a2a05"/>
+    </linearGradient>
+    <linearGradient id="empanada" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffdb7a"/>
+      <stop offset="60%" stop-color="#e0a026"/>
+      <stop offset="100%" stop-color="#8a5a0f"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg-emp)"/>
+  <circle cx="150" cy="120" r="230" fill="#fff" opacity="0.1"/>
+  <circle cx="680" cy="520" r="280" fill="#000" opacity="0.18"/>
+
+  <!-- Tabla de madera -->
+  <rect x="100" y="220" width="600" height="280" rx="28" fill="#5a3416"/>
+  <rect x="120" y="236" width="560" height="250" rx="20" fill="#7a4a24"/>
+  <g stroke="#5a3416" stroke-width="2" opacity="0.5">
+    <line x1="140" y1="260" x2="670" y2="265"/>
+    <line x1="140" y1="340" x2="670" y2="348"/>
+    <line x1="140" y1="420" x2="670" y2="430"/>
+  </g>
+
+  <!-- Empanada 1 (grande central) -->
+  <g transform="translate(380 340)">
+    <path d="M -130 -10 q -40 -80 40 -110 q 80 -28 140 20 q 60 48 30 110 q -35 72 -120 68 q -80 -4 -90 -88 z"
+          fill="url(#empanada)"/>
+    <path d="M -125 -5 q 60 -80 135 -75 q 70 5 95 75"
+          stroke="#8a5a0f" stroke-width="5" fill="none" opacity="0.7"/>
+    <!-- Repulgue -->
+    <g stroke="#5a3a10" stroke-width="4" fill="none" opacity="0.8">
+      <path d="M -120 -5 q -5 -12 10 -18"/>
+      <path d="M -90 -30 q 0 -12 15 -15"/>
+      <path d="M -55 -52 q 4 -12 20 -10"/>
+      <path d="M -10 -68 q 8 -10 24 -5"/>
+      <path d="M 40 -65 q 12 -6 22 5"/>
+      <path d="M 85 -50 q 15 0 18 14"/>
+      <path d="M 115 -25 q 14 5 12 20"/>
+    </g>
+  </g>
+
+  <!-- Empanada 2 (arriba derecha) -->
+  <g transform="translate(580 280) rotate(-20)">
+    <path d="M -80 0 q -25 -50 25 -70 q 55 -18 95 12 q 40 30 20 68 q -24 45 -80 42 q -55 -4 -60 -52 z"
+          fill="url(#empanada)"/>
+    <g stroke="#5a3a10" stroke-width="3" fill="none" opacity="0.7">
+      <path d="M -76 2 q -3 -8 6 -12"/>
+      <path d="M -56 -22 q 2 -9 12 -11"/>
+      <path d="M -30 -40 q 6 -7 16 -5"/>
+      <path d="M 5 -52 q 8 -4 18 2"/>
+      <path d="M 40 -50 q 10 0 14 10"/>
+      <path d="M 65 -35 q 10 4 8 14"/>
+    </g>
+  </g>
+
+  <!-- Empanada 3 (abajo izq) -->
+  <g transform="translate(220 420) rotate(12)">
+    <path d="M -75 0 q -22 -45 22 -65 q 52 -20 90 8 q 38 28 20 62 q -22 42 -75 40 q -50 -3 -57 -45 z"
+          fill="url(#empanada)"/>
+    <g stroke="#5a3a10" stroke-width="3" fill="none" opacity="0.7">
+      <path d="M -70 2 q -3 -7 6 -11"/>
+      <path d="M -50 -18 q 2 -8 11 -10"/>
+      <path d="M -25 -34 q 6 -7 14 -5"/>
+      <path d="M 8 -45 q 8 -3 17 2"/>
+      <path d="M 40 -42 q 10 0 13 9"/>
+    </g>
+  </g>
+
+  <!-- Ají (salsera) -->
+  <g transform="translate(160 280)">
+    <ellipse cx="0" cy="14" rx="48" ry="14" fill="#000" opacity="0.2"/>
+    <ellipse cx="0" cy="0" rx="48" ry="14" fill="#c33c3c"/>
+    <ellipse cx="0" cy="-3" rx="42" ry="10" fill="#7a1414"/>
+    <circle cx="-12" cy="-4" r="2.5" fill="#f4b738"/>
+    <circle cx="8" cy="-5" r="2.5" fill="#f4b738"/>
+    <circle cx="-2" cy="0" r="2.5" fill="#4f8a3e"/>
+    <circle cx="18" cy="-2" r="2" fill="#4f8a3e"/>
+  </g>
+
+  <!-- Limón cortado -->
+  <g transform="translate(620 450)">
+    <circle r="32" fill="#f4d03f"/>
+    <circle r="26" fill="#fff8c2"/>
+    <g stroke="#f4b738" stroke-width="2" fill="none">
+      <line x1="-22" y1="0" x2="22" y2="0"/>
+      <line x1="0" y1="-22" x2="0" y2="22"/>
+      <line x1="-16" y1="-16" x2="16" y2="16"/>
+      <line x1="16" y1="-16" x2="-16" y2="16"/>
+    </g>
+    <circle r="4" fill="#f4b738"/>
+  </g>
+
+  <rect width="800" height="600" fill="#000" opacity="0.04"/>
+</svg>
