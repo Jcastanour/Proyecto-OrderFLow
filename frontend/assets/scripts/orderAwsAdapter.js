@@ -1,63 +1,71 @@
 // =========================================================================
 // ADAPTADOR AWS (Producción)
 // =========================================================================
-// Este archivo es el componente real que conecta tu Frontend con Amazon Web Services.
-// Todo su funcionamiento depende estrictamente de que el equipo Backend haya 
-// diseñado sus Lambdas tal cual como se estipuló en el archivo de Requisitos (Misión 3).
+// Traduce entre las claves que usa el frontend (cliente/estado/fecha)
+// y las que devuelve la Lambda (customer/status/createdAt).
+// La URL del API la lee de window.ENV.API_URL (inyectada en env.js).
+// =========================================================================
 
-// 👇 ¡AQUÍ PEGARÁS LA URL DEL ENPOINT DEL API GATEWAY CUANDO TU EQUIPO LA TERMINE!
-const API_URL = "https://URL-DE-TU-API-GATEWAY.execute-api.us-east-1.amazonaws.com/pedidos"; 
+const API_URL = (typeof window !== 'undefined' && window.ENV && window.ENV.API_URL) || '';
 
+// ---- Traducción de claves ------------------------------------------------
+function mapearDesdeAws(item) {
+    if (!item) return item;
+    return {
+        orderId: item.orderId,
+        cliente: item.customer,
+        items:   item.items || [],
+        estado:  item.status,
+        fecha:   item.createdAt,
+        total:   item.total ?? 0
+    };
+}
+
+function mapearListaDesdeAws(lista) {
+    return (lista || []).map(mapearDesdeAws);
+}
+
+// ---- Helper fetch JSON ---------------------------------------------------
+async function pedirJson(url, opciones = {}) {
+    const respuesta = await fetch(url, {
+        headers: { 'Content-Type': 'application/json' },
+        ...opciones
+    });
+    if (!respuesta.ok) {
+        throw new Error(`HTTP ${respuesta.status}`);
+    }
+    return respuesta.json();
+}
+
+// ---- API ----------------------------------------------------------------
 export const OrderAdapter = {
-    
-    // (1) POST: Petición para enviar la compra hacia DynamoDB (Apunta a Lambda createOrder)
-    crearPedido: async (pedidoData) => {
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(pedidoData) 
-                // El frontend envía: { cliente: "Juan", items: [...] }
-            });
-            const result = await response.json();
-            return result; 
-            // El Frontend asume que la Lambda devolverá: { status: "success", data: { ... } }
-        } catch (error) {
-            console.error("Fallo CATASTRÓFICO de red al crear pedido en AWS:", error);
-            throw error;
-        }
+
+    // POST /orders
+    crearPedido: async (pedidoFront) => {
+        const body = {
+            customer: pedidoFront.cliente,
+            items:    pedidoFront.items,
+            total:    pedidoFront.totalPagadoOPCIONAL ?? 0
+        };
+        const item = await pedirJson(`${API_URL}/orders`, {
+            method: 'POST',
+            body: JSON.stringify(body)
+        });
+        return { status: 'success', data: mapearDesdeAws(item) };
     },
 
-    // (2) GET: Petición para descargar todos los pedidos (Apunta a Lambda getOrders)
+    // GET /orders
     obtenerPedidos: async () => {
-        try {
-            const response = await fetch(API_URL, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            });
-            const result = await response.json();
-            return result; 
-            // El Frontend asume que la Lambda devolverá: { status: "success", data: [ ...array ] }
-        } catch (error) {
-            console.error("Fallo de descarga de DB en AWS:", error);
-            throw error;
-        }
+        const lista = await pedirJson(`${API_URL}/orders`);
+        return { status: 'success', data: mapearListaDesdeAws(lista) };
     },
 
-    // (3) PUT: Actualiza el Logístico (Apunta a Lambda updateOrder con SQS/SNS oculto)
+    // PATCH /orders/{orderId}
     actualizarPedido: async (orderId, nuevoEstado) => {
-        try {
-            const response = await fetch(API_URL, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ orderId, nuevoEstado })
-            });
-            const result = await response.json();
-            return result; 
-            // El Frontend asume que la Lambda devolverá: { status: "success" }
-        } catch (error) {
-            console.error("Fallo de mutación al actualizar pedido en AWS:", error);
-            throw error;
-        }
+        const item = await pedirJson(`${API_URL}/orders/${orderId}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: nuevoEstado })
+        });
+        return { status: 'success', data: mapearDesdeAws(item) };
     }
 };
