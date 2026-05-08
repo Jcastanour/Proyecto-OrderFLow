@@ -1,0 +1,22 @@
+# Carpeta interna que Terraform crea al hacer `init` (proveedores descargados)
+.terraform/
+.terraform.lock.hcl
+
+# State local — contiene secretos. NUNCA commit.
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Archivos de override locales
+*.auto.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Logs de crash de Terraform
+crash.log
+crash.*.log
+
+# Plan files (binarios)
+*.tfplan
