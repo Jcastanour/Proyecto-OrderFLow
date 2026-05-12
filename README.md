@@ -1,121 +1,233 @@
-# 🍕 OrderFlow - Delivery Management System (Serverless)
+# 🛵 OrderFlow
 
-OrderFlow es una plataforma web de gestión de domicilios rápida, moderna y altamente escalable construida sobre una arquitectura **100% Serverless en AWS** y un Frontend despachado mediante Módulos Nativos de Vanilla JS y Tailwind CSS.
+**App de domicilios de comida colombiana**, construida 100% serverless sobre AWS con Terraform y desplegada con GitHub Actions.
 
-## 🏗️ Arquitectura del Sistema
-El proyecto se divide en dos macro-componentes fuertemente desacoplados:
-
-### 1. Frontend (Clean Architecture y "Mobile-First")
-- **Tecnologías:** HTML5 Semántico, Vanilla JavaScript (Módulos ES6), Tailwind CSS (A través de CDN para máxima portabilidad).
-- **Diseño del Código:** Patrón *Adapter/Repository* (`config.js`) que permite conmutar entre una base de datos Mock local en memoria y el verdadero API Gateway de AWS, logrando desarrollo ágil sin acoplamiento a la nube.
-- **Alojamiento:** Amazon S3 configurado como "Static Website Hosting" (Aprox. $0.005 USD/GB).
-
-### 2. Backend (AWS Cloud Native)
-- **API Gateway (HTTP API):** Punto de entrada ultrarrápido y enrutador de las peticiones REST (`POST /pedidos`, `GET /pedidos`).
-- **AWS Lambda (Node.js 20.x):** Capa de cómputo transitorio. Funciones independientes y sin estado que se encargan de la lógica de negocio básica.
-- **Amazon DynamoDB:** Base de datos NoSQL sin servidor (Tabla `OrderFlow_Pedidos` con Partition Key `orderId`). Escalamiento automático On-Demand logrando latencias de un dígito de milisegundo a cualquier escala.
-- **AWS SNS y SQS (Event-Driven Architecture):** Desacople de procesos. Cuando una Lambda logística actualiza un pedido a estado "En Camino", publica un evento (PublishCommand) en un tópico SNS, el cual alimenta de inmediato una cola SQS tolerante a fallos, previendo un futuro servicio notificador que despache correos/SMS a clientes.
-- **Roles IAM:** Principio del Menor Privilegio (POLP). Las políticas otorgan permisos granulares (Solo lectura/escritura a nombres exactos de tablas y colas).
+> **Proyecto final** · Bootcamp BeTek Cloud · **Grupo 02** · **Proyecto 04**
 
 ---
 
-## 🗂️ Estructura del Frontend
-```
-frontend/
-├── index.html           · Menú público (landing)
-├── nosotros.html        · Historia + pitch AWS
-├── logistica.html       · Panel Kanban de despacho
-└── assets/
-    ├── styles/
-    │   ├── tokens.css   · Design tokens (paleta, tipografía, sombras)
-    │   └── app.css      · Componentes reutilizables (nav, plato, radar, kanban…)
-    ├── scripts/
-    │   ├── app.js              · Lógica del menú + carrito
-    │   ├── logisticaApp.js     · Lógica del tablero Kanban
-    │   ├── config.js           · Adaptador swap: mock ↔ AWS
-    │   ├── orderMock.js        · Base simulada (dev/demos)
-    │   └── orderAwsAdapter.js  · Fetch real al API Gateway
-    └── img/             · (reservado para imágenes propias)
-```
+## 🎯 Qué hace
 
-> **Tipografía:** Fraunces (display) + Geist (body) + JetBrains Mono (mono), vía Google Fonts.
-> **Sistema:** variables CSS en `tokens.css` — cambiar marca/paleta se hace en un solo lugar.
+Tres roles, una sola plataforma:
 
-## 🚀 Instrucciones de Ejecución (Despliegue Local Mock)
-La arquitectura Limpia permite probar la interfaz en milisegundos.
-1. Clonar el repositorio.
-2. Usar un entorno como la extensión **"Live Server"** en Visual Studio Code para evadir el bloqueo nativo (CORS/File protocols).
-3. Abrir la subcarpeta `frontend/` y ejecutar `index.html`.
-   *(Nota técnica: Por defecto, la importación del módulo `/assets/scripts/config.js` inyectará la base simulada `orderMock.js` para pruebas UI instantáneas).*
-
-### 🔌 Pegar el backend AWS cuando esté listo
-Una sola línea de cambio — `frontend/assets/scripts/config.js`:
-```js
-// Cambiar esta línea
-import { OrderAdapter } from './orderMock.js';
-// Por esta
-import { OrderAdapter } from './orderAwsAdapter.js';
-```
-Y editar `orderAwsAdapter.js` con la URL real del API Gateway.
+| Rol | Vista | Qué hace |
+|---|---|---|
+| 🍽️ **Cliente** | `index.html` | Explora 24 platos colombianos en 6 categorías, agrega al carrito, hace pedido y ve el tracker en tiempo real. |
+| 👨‍🍳 **Cocina** | `cocina.html` | Dashboard con KPIs del día y kanban Recibido → En Cocina → Listo. |
+| 🛵 **Repartidor** | `domiciliario.html` | Perfil con rating, ve pedidos listos para recoger, los acepta y marca como entregados. |
 
 ---
 
-## ☁️ Despliegue Frontend
+## 🏗️ Arquitectura
 
-Dos workflows coexisten — uno activo y uno en modo manual:
+```
+                       ┌────────────────────────────────────────┐
+                       │              Frontend                  │
+                       │  S3 (sitio estático)  ·  3 vistas      │
+                       └───────────────┬────────────────────────┘
+                                       │ HTTPS fetch
+                                       ▼
+                       ┌────────────────────────────────────────┐
+                       │     API Gateway HTTP (7 rutas)         │
+                       └────┬──────────┬──────────┬─────────────┘
+                            │          │          │
+                  ┌─────────▼──┐  ┌────▼─────┐  ┌─▼────────┐
+                  │  Lambda    │  │ Lambda   │  │ Lambda   │
+                  │  orders    │  │ products │  │ riders   │
+                  └───┬────┬───┘  └─────┬────┘  └─────┬────┘
+                      │    │            │             │
+                      │    │       ┌────▼──────┐ ┌────▼─────┐
+                      │    │       │ DynamoDB  │ │ DynamoDB │
+                      │    │       │ products  │ │ riders   │
+                      │    │       └───────────┘ └──────────┘
+                      │    │            │
+                      │    │       ┌────▼─────────┐
+                      │    │       │   S3 bucket  │
+                      │    │       │   imágenes   │
+                      │    │       └──────────────┘
+                      │    │
+              ┌───────▼┐   └──► EventBridge bus
+              │DynamoDB│              │
+              │ orders │              ▼
+              └────────┘         SQS notifications
+                                      │
+                                      ▼
+                              ┌──────────────────┐
+                              │ Lambda notifier  │
+                              └────────┬─────────┘
+                                       ▼
+                                  SNS → 📧 email
 
-| Workflow | Estado | Trigger | Uso |
-|---|---|---|---|
-| `.github/workflows/pages.yml` | ✅ **Activo** | push a `main` | Publica el sitio en GitHub Pages automáticamente |
-| `.github/workflows/s3-deploy.yml` | 🟡 **En espera** | manual (`workflow_dispatch`) | Sube a S3 cuando los secrets estén configurados |
+  Observabilidad: CloudWatch (12 alarmas + 1 dashboard con 8 widgets)
+  CI/CD: GitHub Actions (deploy/destroy multi-cuenta personal ↔ betek)
+```
 
-### Transición a S3 (cuando esté listo)
-1. Configurar los secrets en *Settings → Secrets and variables → Actions*.
-2. En `s3-deploy.yml`, descomentar el bloque `push:` para activar deploy automático.
-3. En `pages.yml`, renombrarlo a `pages.yml.off` (o borrarlo) para desactivar Pages.
-4. En *Settings → Pages*, poner `Source = None`.
+Ver diagrama visual en [`Docs/diagrama-arquitectura.png`](Docs/diagrama-arquitectura.png) (prompt para generarlo: [`Docs/PROMPT_DIAGRAMA.md`](Docs/PROMPT_DIAGRAMA.md)).
 
-### Secrets requeridos para S3
-| Secret | Descripción |
+---
+
+## 🧱 Stack AWS
+
+| Servicio | Para qué |
 |---|---|
-| `AWS_ACCESS_KEY_ID` | Credencial del usuario IAM de despliegue |
-| `AWS_SECRET_ACCESS_KEY` | Credencial del usuario IAM de despliegue |
-| `AWS_REGION` | Ej. `us-east-1` |
-| `S3_BUCKET` | Nombre del bucket (ej. `orderflow-site`) |
-| `CLOUDFRONT_DISTRIBUTION_ID` | *(opcional)* Invalida la caché tras cada deploy |
-
-**Política IAM mínima** del usuario de despliegue:
-- `s3:ListBucket` sobre el bucket
-- `s3:PutObject`, `s3:DeleteObject`, `s3:GetObject` sobre el contenido
-- `cloudfront:CreateInvalidation` (si usas CDN)
-
-El workflow cachea assets (`css/js/img`) por 24h y fuerza `no-cache` en los HTML — los cambios se ven al instante sin romper performance.
+| **Lambda** (Python 3.12) | 4 funciones: `orders`, `notifier`, `products`, `riders` |
+| **API Gateway HTTP** | 7 rutas REST (`/orders`, `/products`, `/riders`) |
+| **DynamoDB** | 3 tablas on-demand: `orders`, `products`, `riders` |
+| **S3** | 3 buckets: state Terraform, sitio web, imágenes de comida |
+| **EventBridge** | Bus central de eventos de dominio |
+| **SQS** | Cola entre EventBridge y Lambda notifier |
+| **SNS** | Topic de alertas → email al admin |
+| **CloudWatch** | 12 alarmas (Lambda errors, API 5xx, SQS age, DynamoDB throttles) + dashboard |
+| **IAM** | Roles least-privilege por Lambda |
 
 ---
 
-## ⚙️ Instrucciones de Despliegue en AWS
-*(Flujo mediante la Consola Interactiva de AWS bajo la metodología ClickOps para fines demotrativos de este proyecto, integrando con CI/CD)*
+## 🛠️ Stack del frontend
 
-1. **Configuración de Datos y Red (Backend)**
-   - Navegue a AWS DynamoDB. Cree una nueva tabla llamada `OrderFlow_Pedidos` con la clave de partición `orderId` tipo String. Provisionamiento On-Demand.
-   - Navegue a AWS SNS y cree el tópico de notificaciones estándar, seguido de una cola en AWS SQS suscrita a este tópico.
-
-2. **Gestión de Identidades (IAM)**
-   - Navegue a IAM > Roles > Crear Nuevo Rol (Servicio Lambda).
-   - Adjunte las políticas preconfiguradas: `AmazonDynamoDBFullAccess`, `AmazonSNSFullAccess` y `AWSLambdaBasicExecutionRole`. Nombrarlo `OrderFlow_LambdaRole`.
-
-3. **Cómputo Transitorio (Lambda)**
-   - Cree 3 funciones Lambda Node.js (ej. `createOrder`, `getOrder`, `updateOrder`). Asigne el Rol de IAM previo.
-   - Pegue el código JavaScript contenido dentro de la carpeta local `./backend/src/` hacia el editor en línea de AWS.
-
-4. **Exposición de Servicios (API Gateway)**
-   - Cree un nuevo HTTP API.
-   - Establezca Rutas e integre (`Attach Integration`) apuntando hacia su Lambda respectiva autorizando métodos de tipo OPTIONS/CORS globalmente.
+- **HTML5 + Vanilla JS (ES Modules) + CSS modular** — sin frameworks, sin bundler.
+- **Diseño 2026**: paleta brasa/cilantro/yuca, tipografías Inter + Manrope, mobile-first.
+- **Adapter mock ↔ AWS**: el frontend funciona en local sin AWS (modo mock) o contra el API real (modo AWS), según `window.ENV.API_URL`.
+- **Matching dinámico de imágenes**: tirá un archivo `{slug-del-plato}.png` (o `.jpg`, `.svg`, `.webp`) en `/images/` y el deploy lo asocia automáticamente al producto correspondiente. Sin tocar código.
 
 ---
 
-## 📊 Monitoreo Crítico (CloudWatch)
-Para asegurar niveles operativos SLA de la start-up, el sistema automatiza el volcado de trazas hacia **Amazon CloudWatch**, configurando alarmas para:
-- Vigilancia de cuellos de botella controlando la métrica `Duration` de la Lambda de creación de pedidos (Superando los 3.0s).
-- Detección de caída de la red levantando el flag en `5xxErrorRate` del API Gateway.
-- Verificación del Desacople asíncrono disparando alertas si la edad máxima del mensaje de la SQS (`ApproximateAgeOfOldestMessage`) supera parámetros críticos, indicando colapso de notificación en logística.
+## 📁 Estructura del repo
+
+```
+.github/workflows/
+├── deploy.yml          ← Push a main = deploy automático (CI/CD)
+└── destroy.yml         ← Botón manual con confirmación
+
+infra/                  ← TODA la infraestructura (Terraform modular)
+├── main.tf, outputs.tf, variables.tf, providers.tf, backend.tf
+├── seed/
+│   ├── products.json   ← 24 platos
+│   ├── riders.json     ← 1 rider demo
+│   └── seed_dynamo.py  ← Carga los JSON en DynamoDB
+└── modules/
+    ├── data/           — Tablas DynamoDB
+    ├── compute/        — Lambdas (Python 3.12)
+    │   └── lambdas/    — orders_handler, notifier_handler, products_handler, riders_handler
+    ├── api/            — API Gateway HTTP + rutas + integraciones
+    ├── messaging/      — EventBridge bus + SQS + SNS
+    ├── images/         — Bucket S3 público de imágenes
+    ├── frontend/       — Bucket S3 + website hosting del sitio
+    └── observability/  — Alarmas CloudWatch + Dashboard
+
+frontend/               ← El sitio (3 vistas)
+├── index.html          — Cliente
+├── cocina.html         — Admin/cocina
+├── domiciliario.html   — Repartidor
+├── nosotros.html       — Página informativa
+└── assets/             — CSS, JS, copias locales de imágenes para modo mock
+
+images/                 ← FUENTE DE VERDAD de las imágenes de comida
+                          (se suben automáticamente al bucket S3 en cada deploy)
+```
+
+---
+
+## 🚀 Cómo desplegar
+
+### Pre-requisitos (una sola vez por cuenta AWS)
+
+1. **Bucket de state Terraform** (mismo nombre en ambas cuentas):
+   ```bash
+   aws s3api create-bucket --bucket orderflow-g2p4-tfstate --region us-east-1
+   aws s3api put-bucket-versioning --bucket orderflow-g2p4-tfstate \
+       --versioning-configuration Status=Enabled
+   ```
+
+2. **Usuario IAM** con `PowerUserAccess` (genera Access Key + Secret).
+
+3. **Secrets en GitHub** (`Settings → Secrets and variables → Actions`):
+
+   | Secret | Para qué |
+   |---|---|
+   | `AWS_ACCESS_KEY_ID_PERSONAL` | Credenciales cuenta personal |
+   | `AWS_SECRET_ACCESS_KEY_PERSONAL` | — |
+   | `AWS_ACCESS_KEY_ID_BETEK` | Credenciales cuenta del bootcamp |
+   | `AWS_SECRET_ACCESS_KEY_BETEK` | — |
+
+### Deploy automático
+
+```bash
+git push origin main
+```
+
+Esto dispara `deploy.yml` que:
+1. Corre `terraform apply` (crea TODA la infra).
+2. Sube las imágenes de `/images/` al bucket S3.
+3. Pobla las tablas DynamoDB con los seeds.
+4. Notifica al SNS con las URLs finales (llega email).
+
+### Deploy manual a la cuenta que elijas
+
+`Actions` → `Deploy a AWS` → `Run workflow` → elegís `personal` o `betek`.
+
+### Destruir todo
+
+`Actions` → `Destroy AWS` → `Run workflow` → elegís cuenta + escribís literal `DESTROY` para confirmar.
+
+---
+
+## 🧪 Probar después del deploy
+
+Al terminar el deploy, en `Actions tab` ves las URLs en el job summary. Probá:
+
+```bash
+# Listar los 24 productos
+curl https://<api_url>/products | jq 'length'
+
+# Producto con imageUrl resuelto desde S3
+curl https://<api_url>/products/p002 | jq '.imageUrl'
+
+# Crear pedido con dirección
+curl -X POST https://<api_url>/orders \
+  -H "Content-Type: application/json" \
+  -d '{"customer":"Juan","items":["Bandeja Paisa"],"total":25000,"direccion":"Calle 85"}'
+
+# Asignar repartidor (rider acepta el pedido)
+curl -X PATCH https://<api_url>/orders/<id> \
+  -H "Content-Type: application/json" \
+  -d '{"status":"En Camino","riderId":"r001"}'
+```
+
+En el navegador: abrí el `site_url` del summary y andá rotando por las 3 vistas.
+
+---
+
+## 💻 Desarrollo local (sin AWS)
+
+```bash
+cd frontend
+python3 -m http.server 8000
+```
+
+Abrí `http://localhost:8000/index.html`. Como `window.ENV.API_URL` está vacío, el frontend usa el adapter mock con los datos en memoria.
+
+Para sumar una imagen nueva en modo mock, copiala a `frontend/assets/img/{slug}.{ext}`. Para producción, la fuente de verdad es `/images/` raíz (el workflow hace `aws s3 sync` desde ahí al bucket S3).
+
+---
+
+## ✅ Requisitos del PDF cumplidos
+
+- AWS Lambda procesando el flujo de pedidos (4 Lambdas en total).
+- API Gateway HTTP con endpoints `POST /orders`, `GET /orders`, `PATCH /orders/{id}`.
+- DynamoDB para almacenamiento (3 tablas: orders, products, riders).
+- Frontend web con formulario de pedido + tracker en tiempo real.
+- Integración con backend mediante fetch al API Gateway.
+- Pipeline CI/CD con GitHub Actions (deploy automático en push a main).
+- Notificaciones de fallo del pipeline al SNS topic admin-alerts.
+- CloudWatch con métricas y alarmas (12 alarmas + dashboard).
+- Integración SNS + SQS con Lambdas (EventBridge → SQS → Lambda notifier → SNS).
+- Repositorio GitHub con backend + frontend + pipeline IaC.
+- README con instrucciones y diagrama de arquitectura.
+
+---
+
+## 👥 Equipo
+
+**Grupo 02** · **Proyecto 04** · Bootcamp BeTek Cloud 2026
+
+— OrderFlow, comida colombiana sin intermediarios glamorosos.

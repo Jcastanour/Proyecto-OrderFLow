@@ -70,7 +70,9 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.6.0"
+          # 1.9.x trae las claves PGP renovadas para los providers de hashicorp.
+          # Con 1.6 se rompe ("error checking signature: openpgp: key expired").
+          terraform_version: "1.9.8"
 
       - name: Setup Python
         uses: actions/setup-python@v5
