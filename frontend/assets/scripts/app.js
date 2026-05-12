@@ -344,12 +344,16 @@ async function cargarMisPedidos() {
 function pintarMisPedidos(pedidos) {
     const seccion = $('misPedidos');
     const lista = $('listaPedidos');
-    if (!pedidos || pedidos.length === 0) {
-        seccion.style.display = 'none';
-        return;
-    }
+    if (!seccion || !lista) return;
+
     seccion.style.display = '';
     lista.innerHTML = '';
+    
+    if (!pedidos || pedidos.length === 0) {
+        lista.innerHTML = '<div style="color: var(--tinta-3); padding: 20px 0;">Aún no tienes pedidos registrados. ¡Anímate a pedir algo delicioso!</div>';
+        return;
+    }
+    
     pedidos.forEach(p => lista.appendChild(crearTracker(p)));
 }
 

@@ -64,7 +64,10 @@ data "aws_iam_policy_document" "orders_lambda_inline_policy_doc" {
       "dynamodb:Scan",
       "dynamodb:Query",
     ]
-    resources = [var.orders_table_arn]
+    resources = [
+      var.orders_table_arn,
+      "${var.orders_table_arn}/index/UserEmailIndex"
+    ]
   }
 
   statement {

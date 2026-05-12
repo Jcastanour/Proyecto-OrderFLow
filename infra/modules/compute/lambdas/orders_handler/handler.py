@@ -197,7 +197,9 @@ def lambda_handler(event, _context):
         if metodo_http == "GET" and ruta == "/orders":
             return listar_pedidos()
         if metodo_http == "GET" and ruta.startswith("/orders/user/") and user_email:
-            return obtener_pedidos_usuario(user_email)
+            import urllib.parse
+            user_email_decoded = urllib.parse.unquote(user_email)
+            return obtener_pedidos_usuario(user_email_decoded)
         if metodo_http == "GET" and order_id:
             return obtener_pedido(order_id)
         if metodo_http == "PATCH" and order_id:
