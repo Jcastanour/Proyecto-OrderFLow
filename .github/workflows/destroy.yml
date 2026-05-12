@@ -104,6 +104,17 @@ jobs:
             aws s3 rm "s3://$IMAGES_BUCKET/" --recursive || true
           fi
 
+      - name: Eliminar Log Groups de Lambdas (evitar ResourceAlreadyExistsException)
+        run: |
+          TARGET=${{ steps.target.outputs.target }}
+          PREFIX="orderflow-g2p4-${TARGET}"
+          
+          echo "Limpiando log groups explícitamente..."
+          aws logs delete-log-group --log-group-name "/aws/lambda/${PREFIX}-orders" || true
+          aws logs delete-log-group --log-group-name "/aws/lambda/${PREFIX}-notifier" || true
+          aws logs delete-log-group --log-group-name "/aws/lambda/${PREFIX}-products" || true
+          aws logs delete-log-group --log-group-name "/aws/lambda/${PREFIX}-riders" || true
+
       - name: Terraform Destroy
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform destroy -auto-approve
