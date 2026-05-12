@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#14110e">
+    <title>Repartidor · OrderFlow</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="assets/styles/tokens.css">
+    <link rel="stylesheet" href="assets/styles/app.css">
+</head>
+<body class="repartidor">
+
+    <!-- ════════════════ PERFIL HEADER ════════════════ -->
+    <section class="rider-perfil">
+        <div class="contenedor">
+            <div class="rider-fila">
+                <div class="rider-avatar" id="riderAvatar">🛵</div>
+                <div class="rider-info">
+                    <div class="saludo">Hola,</div>
+                    <div class="nombre" id="riderNombre">—</div>
+                    <div class="rating" id="riderRating">—</div>
+                </div>
+                <button class="rider-online-toggle" id="btnOnline">En línea</button>
+            </div>
+
+            <div class="rider-stats">
+                <div class="rider-stat">
+                    <div class="valor" id="statEntregasHoy">0</div>
+                    <div class="label">Entregas hoy</div>
+                </div>
+                <div class="rider-stat">
+                    <div class="valor" id="statGanancias">$0</div>
+                    <div class="label">Ganancias</div>
+                </div>
+                <div class="rider-stat">
+                    <div class="valor" id="statHoras">0h</div>
+                    <div class="label">En línea</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ════════════════ TABS ════════════════ -->
+    <main class="contenedor">
+        <div class="rider-tabs">
+            <div class="rider-tabs__nav">
+                <button type="button" class="rider-tabs__btn activo" data-tab="disponibles">
+                    Disponibles <span class="conteo" id="conteoDisponibles">0</span>
+                </button>
+                <button type="button" class="rider-tabs__btn" data-tab="mis-entregas">
+                    Mis entregas <span class="conteo" id="conteoMisEntregas">0</span>
+                </button>
+                <button type="button" class="rider-tabs__btn" data-tab="historial">
+                    Historial <span class="conteo" id="conteoHistorial">0</span>
+                </button>
+            </div>
+
+            <div class="rider-tabs__contenido">
+                <!-- Tab: Disponibles -->
+                <div id="tabDisponibles" class="tab-panel">
+                    <div id="listaDisponibles"></div>
+                </div>
+
+                <!-- Tab: Mis entregas -->
+                <div id="tabMisEntregas" class="tab-panel" style="display:none;">
+                    <div id="listaMisEntregas"></div>
+                </div>
+
+                <!-- Tab: Historial -->
+                <div id="tabHistorial" class="tab-panel" style="display:none;">
+                    <div id="listaHistorial"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Volver al cliente -->
+        <div style="text-align: center; margin-top: 32px; padding-bottom: 80px;">
+            <a href="index.html" style="font-size: 0.85rem; color: var(--tinta-3); text-decoration: underline;">← Volver al cliente</a>
+        </div>
+    </main>
+
+    <!-- ════════════════ TOAST ════════════════ -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <!-- ════════════════ BOTTOM NAV (móvil) ════════════════ -->
+    <nav class="bottom-nav">
+        <button type="button" class="bottom-nav__item activo" data-bottom-tab="disponibles">
+            <svg class="bottom-nav__icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            </svg>
+            Disponibles
+        </button>
+        <button type="button" class="bottom-nav__item" data-bottom-tab="mis-entregas">
+            <svg class="bottom-nav__icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="3" width="15" height="13"/>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+                <circle cx="5.5" cy="18.5" r="2.5"/>
+                <circle cx="18.5" cy="18.5" r="2.5"/>
+            </svg>
+            Mis entregas
+        </button>
+        <button type="button" class="bottom-nav__item" data-bottom-tab="historial">
+            <svg class="bottom-nav__icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Historial
+        </button>
+    </nav>
+
+    <script src="assets/scripts/env.js"></script>
+    <script type="module" src="assets/scripts/domiciliarioApp.js"></script>
+</body>
+</html>

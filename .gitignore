@@ -205,3 +205,14 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+# macOS
+.DS_Store
+
+# Backups de scripts (sed -i.bak)
+*.bak
+
+# Entorno de desarrollo Claude / agentes locales
+.agents/
+skills-lock.json

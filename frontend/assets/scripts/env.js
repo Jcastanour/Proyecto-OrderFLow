@@ -9,5 +9,5 @@
 // =========================================================================
 
 window.ENV = {
-    API_URL: "https://6jo77mm9w7.execute-api.us-east-1.amazonaws.com"
+    API_URL: ""
 };

@@ -1,0 +1,116 @@
+################################################################
+# destroy.yml — Botón "apagar todo" (multi-cuenta)
+#
+# Manual SOLO. Requiere:
+#   - Elegir cuenta (personal | betek)
+#   - Escribir "DESTROY" literal en el input `confirm` (anti-accidente)
+#
+# Como todo es EFÍMERO, terraform destroy borra:
+#   - tablas DynamoDB y sus datos
+#   - bucket S3 imágenes y sus archivos
+#   - bucket S3 sitio
+#   - Lambdas, API Gateway, IAM roles
+#   - EventBridge, SQS, SNS
+#   - CloudWatch alarmas + dashboard
+#
+# Tras este workflow, la cuenta queda como antes del primer deploy
+# (el bucket de tfstate SÍ sobrevive — está fuera del state).
+################################################################
+name: Destroy AWS
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Cuenta AWS a destruir"
+        required: true
+        default: "personal"
+        type: choice
+        options:
+          - personal
+          - betek
+      confirm:
+        description: 'Escribe "DESTROY" para confirmar'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  TF_WORKING_DIR: infra
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Validar confirmación
+        run: |
+          if [ "${{ inputs.confirm }}" != "DESTROY" ]; then
+            echo "::error::Confirmación inválida. Debes escribir literal 'DESTROY' en el input."
+            exit 1
+          fi
+
+      - name: Resolver cuenta destino
+        id: target
+        run: |
+          echo "target=${{ inputs.target }}" >> $GITHUB_OUTPUT
+          echo "🎯 Destruyendo cuenta: ${{ inputs.target }}"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.0"
+
+      - name: AWS credentials · PERSONAL
+        if: steps.target.outputs.target == 'personal'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PERSONAL }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PERSONAL }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: AWS credentials · BETEK
+        if: steps.target.outputs.target == 'betek'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_BETEK }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_BETEK }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init
+
+      # Vaciar buckets S3 antes del destroy (Terraform no borra buckets con objetos)
+      - name: Vaciar buckets S3 (sitio + imágenes)
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          SITE_BUCKET=$(terraform output -raw site_url 2>/dev/null | sed 's|http[s]*://||; s|\.s3.*||' || echo "")
+          IMAGES_BUCKET=$(terraform output -raw images_bucket_name 2>/dev/null || echo "")
+
+          if [ -n "$SITE_BUCKET" ]; then
+            echo "Vaciando $SITE_BUCKET…"
+            aws s3 rm "s3://$SITE_BUCKET/" --recursive || true
+          fi
+          if [ -n "$IMAGES_BUCKET" ]; then
+            echo "Vaciando $IMAGES_BUCKET…"
+            aws s3 rm "s3://$IMAGES_BUCKET/" --recursive || true
+          fi
+
+      - name: Terraform Destroy
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform destroy -auto-approve
+
+      - name: Resumen
+        if: success()
+        run: |
+          echo "### 🗑️ Destroy completado · ${{ steps.target.outputs.target }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Toda la infraestructura de OrderFlow en \`${{ steps.target.outputs.target }}\` fue eliminada." >> $GITHUB_STEP_SUMMARY
+          echo "El bucket de tfstate sobrevive (puede usarse para el próximo deploy)." >> $GITHUB_STEP_SUMMARY

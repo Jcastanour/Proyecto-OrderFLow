@@ -1,0 +1,194 @@
+################################################################
+# deploy.yml — Pipeline CI/CD de OrderFlow (multi-cuenta)
+#
+# Se dispara:
+#   - Automáticamente en cada push a `main` → DESPLIEGA A PERSONAL.
+#   - Manualmente desde Actions → podés elegir target (personal | betek).
+#
+# Multi-cuenta:
+#   El proyecto vive en DOS cuentas AWS distintas:
+#     - personal: tu cuenta con $25 de créditos, deploy de día a día.
+#     - betek:    cuenta del bootcamp, solo el día del proyecto.
+#   Las credenciales de cada cuenta se guardan como secrets en GitHub:
+#     - AWS_ACCESS_KEY_ID_PERSONAL    + AWS_SECRET_ACCESS_KEY_PERSONAL
+#     - AWS_ACCESS_KEY_ID_BETEK       + AWS_SECRET_ACCESS_KEY_BETEK
+#   El step de credenciales elige cuál par usar según el input `target`.
+#
+# Pasos:
+#   1) terraform apply  → crea TODA la infra en la cuenta elegida.
+#   2) aws s3 sync images/      → bucket de imágenes.
+#   3) python seed_dynamo.py    → puebla tablas products + riders.
+#   4) Notificación al SNS topic (email al admin).
+################################################################
+name: Deploy a AWS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Cuenta AWS donde desplegar"
+        required: true
+        default: "personal"
+        type: choice
+        options:
+          - personal
+          - betek
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  TF_WORKING_DIR: infra
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+
+      # ────────────────────────────────────────────────────────
+      # 1) Resolver target (push a main = personal; manual = lo que elija)
+      # ────────────────────────────────────────────────────────
+      - name: Resolver cuenta destino
+        id: target
+        run: |
+          TARGET="${{ inputs.target }}"
+          if [ -z "$TARGET" ]; then
+            TARGET="personal"   # push a main siempre va a personal
+          fi
+          echo "target=$TARGET" >> $GITHUB_OUTPUT
+          echo "🎯 Cuenta destino: $TARGET"
+
+      # ────────────────────────────────────────────────────────
+      # 2) Checkout y setup
+      # ────────────────────────────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.0"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install boto3
+        run: pip install boto3
+
+      # ────────────────────────────────────────────────────────
+      # 3) Configure AWS credentials (según target)
+      #    Solo uno de los dos pasos corre por job, gracias al `if`.
+      # ────────────────────────────────────────────────────────
+      - name: AWS credentials · PERSONAL
+        if: steps.target.outputs.target == 'personal'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_PERSONAL }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_PERSONAL }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: AWS credentials · BETEK
+        if: steps.target.outputs.target == 'betek'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_BETEK }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_BETEK }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # ────────────────────────────────────────────────────────
+      # 4) Terraform: crea/actualiza TODA la infra
+      # ────────────────────────────────────────────────────────
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform apply -auto-approve
+
+      # ────────────────────────────────────────────────────────
+      # 5) Capturar outputs
+      # ────────────────────────────────────────────────────────
+      - name: Capturar outputs de Terraform
+        id: tf
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          echo "products_table=$(terraform output -raw products_table_name)" >> $GITHUB_OUTPUT
+          echo "riders_table=$(terraform output -raw riders_table_name)" >> $GITHUB_OUTPUT
+          echo "images_bucket=$(terraform output -raw images_bucket_name)" >> $GITHUB_OUTPUT
+          echo "api_url=$(terraform output -raw api_url)" >> $GITHUB_OUTPUT
+          echo "site_url=$(terraform output -raw site_url)" >> $GITHUB_OUTPUT
+          echo "alerts_topic=$(terraform output -raw admin_alerts_topic_arn)" >> $GITHUB_OUTPUT
+
+      # ────────────────────────────────────────────────────────
+      # 6) Sync de imágenes al bucket S3 (incremental)
+      # ────────────────────────────────────────────────────────
+      - name: Subir imágenes al bucket
+        run: |
+          aws s3 sync ./images/ "s3://${{ steps.tf.outputs.images_bucket }}/" \
+              --delete \
+              --exclude "*" \
+              --include "*.png" --include "*.jpg" --include "*.jpeg" \
+              --include "*.svg" --include "*.webp"
+
+      # ────────────────────────────────────────────────────────
+      # 7) Poblar tablas DynamoDB
+      # ────────────────────────────────────────────────────────
+      - name: Seed DynamoDB
+        run: |
+          python3 infra/seed/seed_dynamo.py \
+              --products-table "${{ steps.tf.outputs.products_table }}" \
+              --riders-table "${{ steps.tf.outputs.riders_table }}" \
+              --region "${{ env.AWS_REGION }}"
+
+      # ────────────────────────────────────────────────────────
+      # 8) Notificación de éxito
+      # ────────────────────────────────────────────────────────
+      - name: Notificar éxito al SNS
+        if: success()
+        run: |
+          aws sns publish \
+              --topic-arn "${{ steps.tf.outputs.alerts_topic }}" \
+              --subject "✅ OrderFlow deployed (${{ steps.target.outputs.target }})" \
+              --message "Deploy exitoso en cuenta ${{ steps.target.outputs.target }}.
+
+              Site:    ${{ steps.tf.outputs.site_url }}
+              API:     ${{ steps.tf.outputs.api_url }}
+              Commit:  ${{ github.sha }}
+              Actor:   ${{ github.actor }}"
+
+      - name: Imprimir URLs en el job summary
+        if: success()
+        run: |
+          echo "### ✅ Deploy completado · ${{ steps.target.outputs.target }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Sitio**: ${{ steps.tf.outputs.site_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **API**: ${{ steps.tf.outputs.api_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Bucket imágenes**: \`${{ steps.tf.outputs.images_bucket }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tabla productos**: \`${{ steps.tf.outputs.products_table }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tabla riders**: \`${{ steps.tf.outputs.riders_table }}\`" >> $GITHUB_STEP_SUMMARY
+
+      # ────────────────────────────────────────────────────────
+      # 9) Notificación de fallo
+      # ────────────────────────────────────────────────────────
+      - name: Notificar fallo al SNS
+        if: failure()
+        run: |
+          TOPIC="${{ steps.tf.outputs.alerts_topic }}"
+          if [ -z "$TOPIC" ]; then
+            echo "Sin topic disponible (Terraform falló antes). Skip."
+            exit 0
+          fi
+          aws sns publish \
+              --topic-arn "$TOPIC" \
+              --subject "❌ OrderFlow deploy FAILED (${{ steps.target.outputs.target }})" \
+              --message "El deploy falló en cuenta ${{ steps.target.outputs.target }}.
+
+              Commit: ${{ github.sha }}
+              Actor:  ${{ github.actor }}
+              Logs:   ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

@@ -1,0 +1,15 @@
+[
+  {
+    "riderId": "r001",
+    "name": "Carlos Rodríguez",
+    "avatar": "🛵",
+    "rating": 4.8,
+    "totalDeliveries": 1247,
+    "online": true,
+    "todayStats": {
+      "deliveries": 8,
+      "earnings": 64000,
+      "hoursOnline": 5.2
+    }
+  }
+]

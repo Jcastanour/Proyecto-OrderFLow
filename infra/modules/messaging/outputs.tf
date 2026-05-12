@@ -18,6 +18,11 @@ output "notifications_queue_url" {
   value       = aws_sqs_queue.notifications_queue.url
 }
 
+output "notifications_queue_name" {
+  description = "Nombre de la cola (dimensión QueueName en CloudWatch)."
+  value       = aws_sqs_queue.notifications_queue.name
+}
+
 output "admin_alerts_topic_arn" {
   description = "ARN del topic SNS. La Lambda notifier publica acá."
   value       = aws_sns_topic.admin_alerts_topic.arn

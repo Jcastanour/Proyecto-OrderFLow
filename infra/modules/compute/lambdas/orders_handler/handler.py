@@ -91,6 +91,10 @@ def crear_pedido(body):
         "total": Decimal(str(body.get("total", 0))),
         "status": "Recibido",
         "createdAt": datetime.now(timezone.utc).isoformat(),
+        # Campo nuevo (Etapa A): el cliente puede indicar dirección de entrega.
+        # Si no la manda, dejamos un texto descriptivo (no None) para que
+        # el frontend pueda mostrar algo en todos los casos.
+        "direccion": body.get("direccion") or "Sin dirección registrada",
     }
     orders_table.put_item(Item=pedido)
     publicar_evento("OrderCreated", pedido)
@@ -111,16 +115,47 @@ def obtener_pedido(order_id):
 
 
 def actualizar_estado_pedido(order_id, body):
+    """
+    PATCH /orders/{orderId}
+
+    Cuerpo soportado:
+      { "status": "En Camino" }                  → solo cambia estado
+      { "status": "En Camino", "riderId": "r1" } → estado + asignación de repartidor
+
+    Construimos la UpdateExpression de forma dinámica para incluir solo
+    los campos que el cliente envió.
+    """
     nuevo_estado = body.get("status")
     if not nuevo_estado:
         return respuesta_error("status es requerido")
 
+    # Campos opcionales que la API acepta actualizar junto con status.
+    # Cada uno se traduce a una asignación SET dinámica en DynamoDB.
+    campos_opcionales = {
+        "riderId": body.get("riderId"),
+        "direccion": body.get("direccion"),
+    }
+
+    set_exprs = ["#s = :s"]
+    expr_names = {"#s": "status"}
+    expr_values = {":s": nuevo_estado}
+
+    for nombre_campo, valor in campos_opcionales.items():
+        if valor is None:
+            continue
+        # Usamos placeholders #campo / :campo para evitar conflictos con palabras reservadas
+        placeholder_name = f"#{nombre_campo}"
+        placeholder_value = f":{nombre_campo}"
+        set_exprs.append(f"{placeholder_name} = {placeholder_value}")
+        expr_names[placeholder_name] = nombre_campo
+        expr_values[placeholder_value] = valor
+
     try:
         resultado = orders_table.update_item(
             Key={"orderId": order_id},
-            UpdateExpression="SET #s = :s",
-            ExpressionAttributeNames={"#s": "status"},
-            ExpressionAttributeValues={":s": nuevo_estado},
+            UpdateExpression="SET " + ", ".join(set_exprs),
+            ExpressionAttributeNames=expr_names,
+            ExpressionAttributeValues=expr_values,
             ReturnValues="ALL_NEW",
             ConditionExpression="attribute_exists(orderId)",
         )

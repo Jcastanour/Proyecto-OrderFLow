@@ -3,6 +3,31 @@ output "orders_table_name" {
   value       = module.data.orders_table_name
 }
 
+output "products_table_name" {
+  description = "Nombre de la tabla de productos (la usará el workflow para el seed)."
+  value       = module.data.products_table_name
+}
+
+output "riders_table_name" {
+  description = "Nombre de la tabla de repartidores (la usará el workflow para el seed)."
+  value       = module.data.riders_table_name
+}
+
+output "images_bucket_name" {
+  description = "Bucket S3 de imágenes (el workflow hace `aws s3 sync` acá)."
+  value       = module.images.images_bucket_name
+}
+
+output "images_bucket_url" {
+  description = "URL pública base del bucket de imágenes."
+  value       = module.images.images_bucket_url
+}
+
+output "dashboard_url" {
+  description = "URL directa al dashboard CloudWatch en consola AWS."
+  value       = module.observability.dashboard_url
+}
+
 output "api_url" {
   description = "URL pública de la API."
   value       = module.api.api_url

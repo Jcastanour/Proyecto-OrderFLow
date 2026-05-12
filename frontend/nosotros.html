@@ -3,127 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="OrderFlow — la evolución del domicilio en Colombia. Plataforma serverless que le devuelve el control a los restaurantes de barrio.">
+    <meta name="theme-color" content="#ff6b1f">
     <title>Nosotros · OrderFlow</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Geist:wght@300..700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@500;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="assets/styles/tokens.css">
     <link rel="stylesheet" href="assets/styles/app.css">
 </head>
 <body>
 
-    <header class="nav-top">
-        <div class="contenedor nav-top__fila">
-            <a href="index.html" class="marca" style="text-decoration:none; color:var(--carbon);">
-                Order<span class="marca__acento">Flow</span><span class="marca__punto"></span>
+    <header class="app-header">
+        <div class="contenedor app-header__fila">
+            <a href="index.html" class="marca">
+                <span class="marca__icono">🛵</span>
+                Order<em>Flow</em>
             </a>
-            <nav class="nav-enlaces">
-                <a href="index.html">Menú</a>
+            <div class="app-header__ubicacion"><span class="ciudad">Medellín</span></div>
+            <nav class="app-header__nav">
+                <a href="index.html">Inicio</a>
                 <a href="nosotros.html" class="activo">Nosotros</a>
-                <a href="logistica.html">Logística</a>
             </nav>
-            <a href="index.html" class="pill-carrito" style="background:var(--brasa-humo); color:var(--brasa-hondo);">
-                <span aria-hidden="true">🧑‍🍳</span>
-                <span>Pedir ahora</span>
+            <a href="index.html" class="btn-carrito" aria-label="Volver">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m12-9l2 9"/>
+                    <circle cx="9" cy="20" r="1.5"/>
+                    <circle cx="17" cy="20" r="1.5"/>
+                </svg>
             </a>
         </div>
     </header>
 
-    <main class="contenedor" style="padding-top:48px; padding-bottom:80px;">
+    <main class="contenedor">
+        <section class="about-hero">
+            <h1>Domicilios <em>colombianos</em>, sin intermediarios glamorosos.</h1>
+            <p>OrderFlow conecta directamente al comensal con la cocina del barrio. Sin comisiones abusivas, sin filtros de revista. Hecho con AWS Serverless por estudiantes del Bootcamp BeTek Cloud — Grupo 02, Proyecto 04.</p>
+        </section>
 
-        <!-- Manifiesto (hero) -->
-        <section class="hero-manifiesto grano">
-            <span class="kicker" style="background:rgba(255,255,255,0.18); color:#ffe7c2; border-color:rgba(255,231,194,0.3);">
-                Nuestra misión
-            </span>
-            <h2 style="margin-top:18px;">La evolución del <em>domicilio</em> en Colombia <span aria-hidden="true">🇨🇴</span></h2>
-            <p>
-                Devolviéndole el control a los asaderos, corrientazos y restaurantes de barrio —
-                librándolos de las comisiones abusivas extranjeras.
+        <section>
+            <div class="seccion-titulo">
+                <h2>Cómo funciona</h2>
+            </div>
+            <div class="about-grid">
+                <article class="about-card">
+                    <div class="num">01</div>
+                    <h3>Pides</h3>
+                    <p>Eliges tus platos en la carta, agregas al carrito y confirmas con tu nombre y dirección. Listo.</p>
+                </article>
+                <article class="about-card">
+                    <div class="num">02</div>
+                    <h3>Cocinamos</h3>
+                    <p>El pedido entra al tablero operativo de la cocina. Cuando esté listo, queda disponible para repartidores cercanos.</p>
+                </article>
+                <article class="about-card">
+                    <div class="num">03</div>
+                    <h3>Te llega</h3>
+                    <p>Un repartidor lo toma y lo lleva. Puedes seguir el estado en tiempo real desde tu sección "Mis pedidos".</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="stack-bloque">
+            <h2>Construido sobre <em>AWS Serverless</em></h2>
+            <p style="color: var(--dark-tinta-2); font-size: 1rem; max-width: 60ch; line-height: 1.6;">
+                Sin servidores que mantener. Cada componente escala solo y se cobra solo cuando se usa.
             </p>
-        </section>
-
-        <!-- Problema / Solución -->
-        <section class="dupla">
-            <article class="tarjeta-editorial">
-                <div class="icono" style="background: rgba(195,60,60,0.08); color: var(--salsa);">📉</div>
-                <h3>El problema</h3>
-                <p>
-                    En Colombia la comida es un pilar cultural. Sin embargo, los restaurantes locales
-                    pierden hasta el <strong>30% de sus ganancias</strong> pagando comisiones a apps
-                    de delivery tradicionales. Además, pierden el rastro y el control total sobre
-                    la logística de sus propios envíos.
-                </p>
-            </article>
-
-            <article class="tarjeta-editorial">
-                <div class="icono" style="background: rgba(79,138,62,0.12); color: var(--cilantro);">💡</div>
-                <h3>La solución: OrderFlow</h3>
-                <p>
-                    Nacimos como una plataforma ultra-rápida. El cliente pide directamente al
-                    restaurante y este gestiona la cocción en tiempo real mediante nuestro
-                    <strong>Panel Kanban Logístico</strong>, recuperando el control y el 100%
-                    de sus ingresos.
-                </p>
-            </article>
-        </section>
-
-        <!-- Magia AWS -->
-        <section class="bloque-oscuro">
-            <h3>🔌 La magia tecnológica <em style="font-style:italic; color:#ffd39b;">(AWS Serverless)</em></h3>
-            <div class="trio">
-                <div class="feature">
-                    <span class="feature__emoji">💸</span>
-                    <h4 class="feature__titulo">Costo exacto</h4>
-                    <p class="feature__texto">
-                        Si a las 3:00 AM nadie pide una arepa, mantener el backend encendido nos cuesta
-                        <strong>$0 pesos</strong>. Nuestras funciones <em>AWS Lambda</em> simplemente duermen.
-                    </p>
+            <div class="stack-grid">
+                <div class="stack-item">
+                    <h4>API · Cómputo</h4>
+                    <p>API Gateway HTTP recibe peticiones y dispara Lambdas en Python que procesan cada pedido.</p>
                 </div>
-                <div class="feature">
-                    <span class="feature__emoji">📈</span>
-                    <h4 class="feature__titulo">Resiliencia nube</h4>
-                    <p class="feature__texto">
-                        Si en pleno Día de la Madre estallan los pedidos, <em>API Gateway</em> y
-                        <em>DynamoDB</em> se clonan solos en milisegundos para no colapsar nunca.
-                    </p>
+                <div class="stack-item">
+                    <h4>Datos</h4>
+                    <p>DynamoDB NoSQL con latencia de milisegundos y modelo pay-per-request.</p>
                 </div>
-                <div class="feature">
-                    <span class="feature__emoji">📨</span>
-                    <h4 class="feature__titulo">Desacople asíncrono</h4>
-                    <p class="feature__texto">
-                        Logística fluida usando <em>Amazon SQS y SNS</em>. Aseguramos notificaciones
-                        ininterrumpidas de tu repartidor sin congelar tu pantalla principal.
-                    </p>
+                <div class="stack-item">
+                    <h4>Eventos</h4>
+                    <p>EventBridge + SQS + SNS desacoplan las notificaciones. Si mañana sumamos SMS o Slack, lo enchufamos sin tocar el resto.</p>
+                </div>
+                <div class="stack-item">
+                    <h4>Frontend</h4>
+                    <p>HTML + Vanilla JS + CSS modular. Servido como sitio estático desde S3.</p>
+                </div>
+                <div class="stack-item">
+                    <h4>IaC</h4>
+                    <p>Toda la infraestructura está definida en Terraform. Crear y destruir el ambiente toma minutos.</p>
+                </div>
+                <div class="stack-item">
+                    <h4>Equipo</h4>
+                    <p>Grupo 02, Proyecto 04 · Bootcamp BeTek Cloud · 2026.</p>
                 </div>
             </div>
         </section>
 
-        <!-- Pitch -->
-        <blockquote class="cita">
-            <div class="cita__kicker">El "elevator pitch" 📣</div>
-            <p>
-                "¿Sabían que el 40% de las ganancias de un asadero se quedan en comisiones extranjeras?
-                OrderFlow es una solución omnicanal diseñada en Colombia usando AWS Serverless.
-                El restaurante recupera su negocio, y la nube gestiona el trabajo pesado
-                por centavos de dólar al día."
+        <!-- ════════════════ Vistas internas del equipo ════════════════ -->
+        <section style="padding: 32px 0;">
+            <div class="seccion-titulo">
+                <h2>Vistas del equipo</h2>
+            </div>
+            <p style="color: var(--tinta-3); font-size: 0.92rem; max-width: 60ch; margin-bottom: 20px;">
+                OrderFlow tiene tres roles. Esta es la app del cliente. Los otros dos son aplicaciones internas:
             </p>
-        </blockquote>
+
+            <div class="about-grid">
+                <a href="cocina.html" class="about-card" style="display: block;">
+                    <div class="num">👨‍🍳 Cocina</div>
+                    <h3>Tablero operativo</h3>
+                    <p>Dashboard de la cocina: KPIs del día, kanban de pedidos en preparación, historial.</p>
+                    <p style="margin-top: 12px; color: var(--brasa); font-weight: 600;">Abrir cocina →</p>
+                </a>
+
+                <a href="domiciliario.html" class="about-card" style="display: block;">
+                    <div class="num">🛵 Repartidor</div>
+                    <h3>App del repartidor</h3>
+                    <p>Perfil con ranking, pedidos disponibles para tomar, mis entregas en curso, historial del día.</p>
+                    <p style="margin-top: 12px; color: var(--brasa); font-weight: 600;">Abrir repartidor →</p>
+                </a>
+
+                <a href="index.html" class="about-card" style="display: block;">
+                    <div class="num">🍽️ Cliente</div>
+                    <h3>Carta y pedidos</h3>
+                    <p>Esta misma app: catálogo de 24 platos, carrito, tracker en vivo de tus pedidos.</p>
+                    <p style="margin-top: 12px; color: var(--brasa); font-weight: 600;">Volver al cliente →</p>
+                </a>
+            </div>
+        </section>
+
+        <div style="text-align: center; padding: 40px 0 60px; color: var(--tinta-3); font-size: 0.85rem;">
+            © 2026 OrderFlow — Hecho en Colombia
+        </div>
     </main>
 
-    <!-- Nav móvil inferior -->
-    <nav class="nav-movil">
-        <a href="index.html"><span class="emoji">🍔</span>Menú</a>
-        <a href="nosotros.html" class="activo"><span class="emoji">🇨🇴</span>Nosotros</a>
-        <a href="logistica.html"><span class="emoji">🛵</span>Despacho</a>
+    <nav class="bottom-nav">
+        <a href="index.html" class="bottom-nav__item">
+            <svg class="bottom-nav__icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Inicio
+        </a>
+        <a href="nosotros.html" class="bottom-nav__item activo">
+            <svg class="bottom-nav__icono" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Nosotros
+        </a>
     </nav>
 
-    <style>
-        body { padding-bottom: 96px; }
-        @media (min-width: 768px) { body { padding-bottom: 40px; } }
-    </style>
 </body>
 </html>

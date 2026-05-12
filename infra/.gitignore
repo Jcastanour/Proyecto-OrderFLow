@@ -20,3 +20,7 @@ crash.*.log
 
 # Plan files (binarios)
 *.tfplan
+
+# Build artifacts de las Lambdas (los regenera archive_file en cada apply)
+**/.build/
+**/*.zip

@@ -1,0 +1,351 @@
+// =========================================================================
+// productsMock.js
+// Catálogo de productos demo (24 platos colombianos en 6 categorías).
+// Estructura espejo EXACTA de la tabla DynamoDB `products`.
+//
+// IMÁGENES: NO hay campo imageKey. La imagen se resuelve dinámicamente:
+//   - En modo AWS: la Lambda products_handler hace matching slug → bucket S3.
+//   - En modo mock local: la card prueba assets/img/{slug}.{png,jpg,svg,webp}.
+//
+// Para sumar una imagen nueva: tirá el archivo con el nombre del slug
+// del producto (ej: "ajiaco-santafereno.png") y aparece sola.
+// =========================================================================
+
+export const CATEGORIAS = [
+    { id: 'todos',     nombre: 'Todos',           emoji: '🍽️' },
+    { id: 'tipica',    nombre: 'Típica',          emoji: '🇨🇴' },
+    { id: 'rapida',    nombre: 'Comida rápida',   emoji: '🍔' },
+    { id: 'picadas',   nombre: 'Picadas',         emoji: '🥓' },
+    { id: 'bebidas',   nombre: 'Bebidas',         emoji: '🥤' },
+    { id: 'postres',   nombre: 'Postres',         emoji: '🍰' },
+    { id: 'desayunos', nombre: 'Desayunos',       emoji: '☕' }
+];
+
+export const PRODUCTS_MOCK = [
+    // ─── Típica colombiana ────────────────────────────────────────────
+    {
+        productId: 'p001',
+        name: 'Bandeja Paisa',
+        description: 'La clásica antioqueña. Frijoles cargados, arroz, chicharrón carnudo, carne molida, huevo frito, tajada madura, chorizo y aguacate.',
+        price: 25000,
+        category: 'tipica',
+        emoji: '🍛',
+        tags: ['tradicional', 'contundente'],
+        rating: 4.9,
+        prepMinutes: 25,
+        available: true
+    },
+    {
+        productId: 'p002',
+        name: 'Ajiaco Santafereño',
+        description: 'Sopa bogotana con tres papas, pollo deshebrado, mazorca, alcaparras y crema. Servido con aguacate y arroz.',
+        price: 23000,
+        category: 'tipica',
+        emoji: '🍲',
+        tags: ['bogotano', 'sopa'],
+        rating: 4.8,
+        prepMinutes: 30,
+        available: true
+    },
+    {
+        productId: 'p003',
+        name: 'Sancocho Trifásico',
+        description: 'Sancocho con tres carnes: gallina, costilla de res y cerdo. Plátano, yuca, mazorca y cilantro fresco.',
+        price: 28000,
+        category: 'tipica',
+        emoji: '🍜',
+        tags: ['compartir', 'sopa'],
+        rating: 4.7,
+        prepMinutes: 35,
+        available: true
+    },
+    {
+        productId: 'p004',
+        name: 'Lechona Tolimense',
+        description: 'Lechona horneada al estilo tolimense con arroz, arvejas y cuero crocante. Servida con arepa.',
+        price: 26500,
+        category: 'tipica',
+        emoji: '🥩',
+        tags: ['tolimense', 'horneado'],
+        rating: 4.9,
+        prepMinutes: 20,
+        available: true
+    },
+
+    // ─── Comida rápida ────────────────────────────────────────────────
+    {
+        productId: 'p005',
+        name: 'Empanadas Vallunas ×5',
+        description: 'Cinco crujientes empanadas vallunas de carne y papa, fritas al momento, con ají casero y limón.',
+        price: 12000,
+        category: 'rapida',
+        emoji: '🥟',
+        tags: ['compartir', 'picante'],
+        rating: 4.8,
+        prepMinutes: 12,
+        available: true
+    },
+    {
+        productId: 'p006',
+        name: 'Salchipapa Salvaje',
+        description: 'Papas a la francesa, salchicha ahumada, queso costeño fundido, tocineta crocante y huevos de codorniz.',
+        price: 22000,
+        category: 'rapida',
+        emoji: '🍟',
+        tags: ['callejera', 'picante'],
+        rating: 4.7,
+        prepMinutes: 15,
+        available: true
+    },
+    {
+        productId: 'p007',
+        name: 'Hamburguesa Criolla',
+        description: 'Hamburguesa de res 200g con queso, huevo frito, tocineta, papitas y salsa rosada en pan brioche.',
+        price: 24500,
+        category: 'rapida',
+        emoji: '🍔',
+        tags: ['favorita'],
+        rating: 4.6,
+        prepMinutes: 18,
+        available: true
+    },
+    {
+        productId: 'p008',
+        name: 'Perro Caliente Colombiano',
+        description: 'Hot dog con salchicha, queso costeño, papitas, tocineta, piña, salsas rosa y verde.',
+        price: 14000,
+        category: 'rapida',
+        emoji: '🌭',
+        tags: ['callejera'],
+        rating: 4.5,
+        prepMinutes: 10,
+        available: true
+    },
+
+    // ─── Picadas ──────────────────────────────────────────────────────
+    {
+        productId: 'p009',
+        name: 'Picada Antioqueña',
+        description: 'Para 2 personas: chicharrón, chorizo, morcilla, papa criolla, plátano maduro, yuca y arepas.',
+        price: 38000,
+        category: 'picadas',
+        emoji: '🍢',
+        tags: ['compartir'],
+        rating: 4.9,
+        prepMinutes: 20,
+        available: true
+    },
+    {
+        productId: 'p010',
+        name: 'Chorizo con Arepa',
+        description: 'Chorizo santarrosano a la parrilla con arepa de maíz blanco y guacamole.',
+        price: 11000,
+        category: 'picadas',
+        emoji: '🌭',
+        tags: ['parrilla'],
+        rating: 4.6,
+        prepMinutes: 12,
+        available: true
+    },
+    {
+        productId: 'p011',
+        name: 'Yuca Frita',
+        description: 'Yuca frita crocante por fuera y suave por dentro. Acompañada de hogao y suero costeño.',
+        price: 9000,
+        category: 'picadas',
+        emoji: '🥔',
+        tags: ['vegetariana'],
+        rating: 4.4,
+        prepMinutes: 10,
+        available: true
+    },
+    {
+        productId: 'p012',
+        name: 'Patacones con Hogao',
+        description: 'Patacones de plátano verde fritos al momento, con hogao costeño y queso costeño rallado.',
+        price: 10500,
+        category: 'picadas',
+        emoji: '🍌',
+        tags: ['costeña', 'vegetariana'],
+        rating: 4.7,
+        prepMinutes: 12,
+        available: true
+    },
+
+    // ─── Bebidas ──────────────────────────────────────────────────────
+    {
+        productId: 'p013',
+        name: 'Lulada Caleña',
+        description: 'Bebida fría de lulo machacado, hielo y limón. La sed del Valle del Cauca.',
+        price: 8500,
+        category: 'bebidas',
+        emoji: '🍹',
+        tags: ['fría', 'caleña'],
+        rating: 4.8,
+        prepMinutes: 5,
+        available: true
+    },
+    {
+        productId: 'p014',
+        name: 'Limonada de Coco',
+        description: 'Limonada cremosa con coco, leche y hielo licuado. Refrescante y dulce.',
+        price: 9000,
+        category: 'bebidas',
+        emoji: '🥥',
+        tags: ['fría', 'cremosa'],
+        rating: 4.9,
+        prepMinutes: 5,
+        available: true
+    },
+    {
+        productId: 'p015',
+        name: 'Aguapanela con Queso',
+        description: 'Aguapanela caliente con bloque de queso costeño. Tradición pura.',
+        price: 7000,
+        category: 'bebidas',
+        emoji: '☕',
+        tags: ['caliente', 'tradicional'],
+        rating: 4.5,
+        prepMinutes: 6,
+        available: true
+    },
+    {
+        productId: 'p016',
+        name: 'Chicha de Maíz',
+        description: 'Bebida fermentada de maíz, dulce y especiada. Servida fría con canela.',
+        price: 7500,
+        category: 'bebidas',
+        emoji: '🍺',
+        tags: ['fermentada', 'tradicional'],
+        rating: 4.3,
+        prepMinutes: 4,
+        available: true
+    },
+
+    // ─── Postres ──────────────────────────────────────────────────────
+    {
+        productId: 'p017',
+        name: 'Arepa de Chócolo',
+        description: 'Arepa dulce de maíz tierno recién asada, con doble porción de quesito doble crema derretido.',
+        price: 18500,
+        category: 'postres',
+        emoji: '🌽',
+        tags: ['dulce', 'vegetariana'],
+        rating: 4.8,
+        prepMinutes: 10,
+        available: true
+    },
+    {
+        productId: 'p018',
+        name: 'Obleas con Arequipe',
+        description: 'Dos obleas crocantes con arequipe, queso rallado, mora y crema chantilly.',
+        price: 8000,
+        category: 'postres',
+        emoji: '🥞',
+        tags: ['dulce', 'callejera'],
+        rating: 4.7,
+        prepMinutes: 4,
+        available: true
+    },
+    {
+        productId: 'p019',
+        name: 'Brevas con Arequipe',
+        description: 'Brevas en almíbar rellenas de arequipe casero. Con queso doble crema.',
+        price: 12000,
+        category: 'postres',
+        emoji: '🍯',
+        tags: ['dulce', 'tradicional'],
+        rating: 4.6,
+        prepMinutes: 5,
+        available: true
+    },
+    {
+        productId: 'p020',
+        name: 'Tres Leches',
+        description: 'Bizcocho esponjoso bañado en tres leches, con merengue tostado y canela.',
+        price: 10000,
+        category: 'postres',
+        emoji: '🍰',
+        tags: ['dulce', 'cremoso'],
+        rating: 4.8,
+        prepMinutes: 5,
+        available: true
+    },
+
+    // ─── Desayunos ────────────────────────────────────────────────────
+    {
+        productId: 'p021',
+        name: 'Calentado Paisa',
+        description: 'Frijoles, arroz, chicharrón, chorizo, huevo, arepa y chocolate caliente. El desayuno paisa.',
+        price: 17000,
+        category: 'desayunos',
+        emoji: '🍳',
+        tags: ['paisa', 'desayuno'],
+        rating: 4.9,
+        prepMinutes: 18,
+        available: true
+    },
+    {
+        productId: 'p022',
+        name: 'Changua Bogotana',
+        description: 'Sopa bogotana de leche, huevos pochados, cilantro y cebolla. Servida con calado.',
+        price: 12500,
+        category: 'desayunos',
+        emoji: '🥣',
+        tags: ['bogotana', 'sopa'],
+        rating: 4.5,
+        prepMinutes: 15,
+        available: true
+    },
+    {
+        productId: 'p023',
+        name: 'Caldo de Costilla',
+        description: 'Caldo concentrado de costilla con cilantro fresco, cebolla y papa criolla. Con arepa de maíz.',
+        price: 13500,
+        category: 'desayunos',
+        emoji: '🍖',
+        tags: ['caliente', 'reconstituyente'],
+        rating: 4.7,
+        prepMinutes: 18,
+        available: true
+    },
+    {
+        productId: 'p024',
+        name: 'Tamal Tolimense',
+        description: 'Tamal grande envuelto en hoja de plátano, con pollo, cerdo, arroz, garbanzo y verduras.',
+        price: 15000,
+        category: 'desayunos',
+        emoji: '🫔',
+        tags: ['tolimense', 'tradicional'],
+        rating: 4.8,
+        prepMinutes: 20,
+        available: true
+    }
+];
+
+// Top 4 — ordenados por rating, tomamos los más populares
+export const PRODUCTS_TENDENCIAS = [...PRODUCTS_MOCK]
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 6);
+
+// Helper: obtener producto por ID
+export function getProductById(productId) {
+    return PRODUCTS_MOCK.find(p => p.productId === productId);
+}
+
+// Helper: filtrar por categoría
+export function getProductsByCategory(categoryId) {
+    if (categoryId === 'todos') return PRODUCTS_MOCK;
+    return PRODUCTS_MOCK.filter(p => p.category === categoryId);
+}
+
+// Helper: buscar por texto
+export function searchProducts(query) {
+    if (!query) return PRODUCTS_MOCK;
+    const q = query.toLowerCase().trim();
+    return PRODUCTS_MOCK.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        p.tags.some(t => t.toLowerCase().includes(q))
+    );
+}
