@@ -99,8 +99,11 @@ locals {
 
 resource "aws_s3_object" "frontend_static_files" {
   # `fileset` recorre la carpeta y nos da una lista de archivos.
-  # `for_each` crea un aws_s3_object por cada uno.
-  for_each = fileset(var.frontend_source_dir, "**/*")
+  # Excluimos env.js porque se genera dinámicamente en otro recurso.
+  for_each = {
+    for f in fileset(var.frontend_source_dir, "**/*") :
+    f => f if f != "assets/scripts/env.js"
+  }
 
   bucket = aws_s3_bucket.frontend_site_bucket.id
   key    = each.value
@@ -123,11 +126,10 @@ resource "aws_s3_object" "frontend_static_files" {
 resource "aws_s3_object" "frontend_env_js" {
   bucket       = aws_s3_bucket.frontend_site_bucket.id
   key          = "assets/scripts/env.js"
-  content      = "window.ENV = { API_URL: \"${var.api_url}\", USER_POOL_ID: \"${var.user_pool_id}\", CLIENT_ID: \"${var.user_pool_client_id}\" };\n"
+  content      = "window.ENV = { API_URL: \"${var.api_url}\", USER_POOL_ID: \"${var.user_pool_id}\", CLIENT_ID: \"${var.user_pool_client_id}\" };\n// Generado por Terraform\n"
   content_type = "application/javascript"
-  etag         = md5("window.ENV = { API_URL: \"${var.api_url}\", USER_POOL_ID: \"${var.user_pool_id}\", CLIENT_ID: \"${var.user_pool_client_id}\" };\n")
+  etag         = md5("window.ENV = { API_URL: \"${var.api_url}\", USER_POOL_ID: \"${var.user_pool_id}\", CLIENT_ID: \"${var.user_pool_client_id}\" };\n// Generado por Terraform\n")
 
-  # Se aplica DESPUÉS de la subida masiva: si frontend/assets/scripts/env.js
-  # existe localmente como placeholder, este lo sobrescribe con la URL real.
+  # Se genera independientemente del for_each.
   depends_on = [aws_s3_object.frontend_static_files]
 }

@@ -470,7 +470,25 @@ async function procesarAuth(e) {
     const clientId = (window.ENV && window.ENV.CLIENT_ID) || '';
 
     try {
-        if (!clientId) throw new Error('Cliente de AWS no configurado (env.js)');
+        if (!clientId) {
+            // MODO MOCK LOCAL
+            if (authModoRegistro) {
+                mostrarToast('Cuenta creada localmente (Mock). Iniciando...', 'exito');
+                authModoRegistro = false;
+            }
+            const nameField = $('authName');
+            loggedInUser = {
+                email: email,
+                name: (nameField && nameField.value.trim()) || email.split('@')[0],
+                token: 'mock-jwt-token-123'
+            };
+            localStorage.setItem('orderflow_user', JSON.stringify(loggedInUser));
+            actualizarUIAuth();
+            cerrarAuth();
+            mostrarToast('¡Hola, ' + loggedInUser.name + ' (Mock)!', 'exito');
+            cargarMisPedidos();
+            return;
+        }
 
         if (authModoRegistro) {
             const name = $('authName').value.trim();
