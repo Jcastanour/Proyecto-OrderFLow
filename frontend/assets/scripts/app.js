@@ -15,6 +15,11 @@ let modalProductId = null;
 let modalCantidad = 1;
 let pollingTimers = new Map();           // orderId -> intervalId
 
+// ═══════════════ Estado global Auth ═══════════════
+let authModoRegistro = false;
+let loggedInUser = null;
+const COGNITO_URL = 'https://cognito-idp.us-east-1.amazonaws.com/';
+
 // ═══════════════ Helpers sobre el catálogo cargado ═══════════════
 function getProductById(productId) {
     return productos.find(p => p.productId === productId);
@@ -314,15 +319,21 @@ function cerrarCarrito() {
 
 // ═══════════════ Pedidos / tracker ═══════════════
 async function cargarMisPedidos() {
+    if (!loggedInUser) {
+        $('misPedidos').style.display = 'none';
+        if ($('navMisPedidos')) $('navMisPedidos').style.display = 'none';
+        return;
+    }
+    if ($('navMisPedidos')) $('navMisPedidos').style.display = 'inline-block';
+
     try {
-        const respuesta = await api.obtenerPedidos();
+        const respuesta = await api.obtenerMisPedidos(loggedInUser.email);
         const pedidos = respuesta.data || [];
-        // Mostrar solo pedidos recientes del usuario actual (en mock = todos los nuevos)
-        // Filtramos por algo simple: solo los que empiezan por ORD- y están activos.
+        // Mostrar pedidos recientes del usuario actual
         const recientes = pedidos
             .slice()
             .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
-            .slice(0, 4);
+            .slice(0, 10);
         pintarMisPedidos(recientes);
     } catch (e) {
         console.error(e);
@@ -402,6 +413,12 @@ async function procesarPedido(formNombre, formDireccion, btnSubmit, btnTextEl) {
     const nombresItems = carrito.flatMap(i => Array(i.quantity).fill(i.name));
     const total = calcularTotal();
 
+    if (!loggedInUser) {
+        mostrarToast('Debes iniciar sesión para hacer un pedido', 'error');
+        abrirAuth();
+        return;
+    }
+
     if (btnTextEl) btnTextEl.textContent = 'Procesando…';
     btnSubmit.disabled = true;
 
@@ -410,7 +427,8 @@ async function procesarPedido(formNombre, formDireccion, btnSubmit, btnTextEl) {
             cliente: nombreVal,
             items: nombresItems,
             totalPagadoOPCIONAL: total,
-            direccion: direccionVal
+            direccion: direccionVal,
+            userEmail: loggedInUser.email
         });
         vaciarCarrito();
         formNombre.value = '';
@@ -426,6 +444,158 @@ async function procesarPedido(formNombre, formDireccion, btnSubmit, btnTextEl) {
     } finally {
         if (btnTextEl) btnTextEl.textContent = 'Pedir ahora';
         btnSubmit.disabled = false;
+    }
+}
+
+// ═══════════════ Auth ═══════════════
+function abrirAuth() {
+    $('authOverlay').classList.add('abierto');
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarAuth() {
+    $('authOverlay').classList.remove('abierto');
+    document.body.style.overflow = '';
+}
+
+async function procesarAuth(e) {
+    e.preventDefault();
+    const email = $('authEmail').value.trim();
+    const password = $('authPassword').value;
+    const btn = $('authBtnSubmit');
+    const prevText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Procesando...';
+
+    const clientId = (window.ENV && window.ENV.CLIENT_ID) || '';
+
+    try {
+        if (!clientId) throw new Error('Cliente de AWS no configurado (env.js)');
+
+        if (authModoRegistro) {
+            const name = $('authName').value.trim();
+            const payload = {
+                ClientId: clientId,
+                Username: email,
+                Password: password,
+                UserAttributes: [{ Name: 'email', Value: email }, { Name: 'name', Value: name }]
+            };
+            const res = await fetch(COGNITO_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-amz-json-1.1', 'X-Amz-Target': 'AWSCognitoIdentityProviderService.SignUp' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Error registrando usuario');
+            
+            mostrarToast('Cuenta creada. Iniciando sesión...', 'exito');
+            authModoRegistro = false;
+        }
+
+        const payload = {
+            AuthFlow: 'USER_PASSWORD_AUTH',
+            ClientId: clientId,
+            AuthParameters: { USERNAME: email, PASSWORD: password }
+        };
+        const res = await fetch(COGNITO_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-amz-json-1.1', 'X-Amz-Target': 'AWSCognitoIdentityProviderService.InitiateAuth' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Credenciales inválidas');
+
+        const idToken = data.AuthenticationResult.IdToken;
+        const payloadDecoded = JSON.parse(atob(idToken.split('.')[1]));
+        
+        loggedInUser = {
+            email: payloadDecoded.email || email,
+            name: payloadDecoded.name || email.split('@')[0],
+            token: idToken
+        };
+        localStorage.setItem('orderflow_user', JSON.stringify(loggedInUser));
+        
+        actualizarUIAuth();
+        cerrarAuth();
+        mostrarToast('¡Hola, ' + loggedInUser.name + '!', 'exito');
+        cargarMisPedidos();
+    } catch (err) {
+        mostrarToast(err.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = prevText;
+    }
+}
+
+function actualizarUIAuth() {
+    if (loggedInUser) {
+        if ($('navLogin')) $('navLogin').style.display = 'none';
+        if ($('navUser')) {
+            $('navUser').style.display = 'inline-block';
+            $('navUser').textContent = loggedInUser.name;
+        }
+        if ($('navLogout')) $('navLogout').style.display = 'inline-block';
+        if ($('nombreInput')) $('nombreInput').value = loggedInUser.name;
+    } else {
+        if ($('navLogin')) $('navLogin').style.display = 'inline-block';
+        if ($('navUser')) $('navUser').style.display = 'none';
+        if ($('navLogout')) $('navLogout').style.display = 'none';
+        if ($('nombreInput')) $('nombreInput').value = '';
+    }
+}
+
+function initAuth() {
+    try {
+        const stored = localStorage.getItem('orderflow_user');
+        if (stored) loggedInUser = JSON.parse(stored);
+    } catch(e) {}
+    
+    actualizarUIAuth();
+
+    if ($('navLogin')) {
+        $('navLogin').addEventListener('click', (e) => {
+            e.preventDefault();
+            abrirAuth();
+        });
+    }
+
+    if ($('navLogout')) {
+        $('navLogout').addEventListener('click', (e) => {
+            e.preventDefault();
+            loggedInUser = null;
+            localStorage.removeItem('orderflow_user');
+            actualizarUIAuth();
+            cargarMisPedidos();
+            mostrarToast('Sesión cerrada');
+            abrirAuth(); // Forzar login otra vez
+        });
+    }
+
+    if ($('cerrarAuth')) $('cerrarAuth').addEventListener('click', cerrarAuth);
+    if ($('authOverlay')) {
+        $('authOverlay').addEventListener('click', (e) => {
+            if (e.target === $('authOverlay')) cerrarAuth();
+        });
+    }
+
+    if ($('authToggleMode')) {
+        $('authToggleMode').addEventListener('click', (e) => {
+            e.preventDefault();
+            authModoRegistro = !authModoRegistro;
+            $('authTitulo').textContent = authModoRegistro ? 'Crear cuenta' : 'Ingresar';
+            $('authBtnSubmit').textContent = authModoRegistro ? 'Registrarme' : 'Ingresar';
+            $('authToggleMode').textContent = authModoRegistro ? '¿Ya tienes cuenta? Ingresa' : '¿No tienes cuenta? Regístrate';
+            $('authNameField').style.display = authModoRegistro ? 'block' : 'none';
+            if (authModoRegistro) $('authName').required = true;
+            else $('authName').required = false;
+        });
+    }
+
+    if ($('authForm')) $('authForm').addEventListener('submit', procesarAuth);
+    
+    // Si no está logueado, forzar apertura del modal de login al cargar
+    if (!loggedInUser) {
+        abrirAuth();
     }
 }
 
@@ -449,6 +619,7 @@ async function cargarCatalogo() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    initAuth();
     cargarCarrito();
     renderCategorias();
     renderCarrito();

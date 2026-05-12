@@ -12,3 +12,11 @@ variable "api_url" {
   description = "URL del API Gateway. Se inyecta en el frontend vía env.js."
   type        = string
 }
+
+variable "user_pool_id" {
+  type = string
+}
+
+variable "user_pool_client_id" {
+  type = string
+}

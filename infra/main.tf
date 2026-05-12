@@ -20,6 +20,15 @@ module "data" {
 }
 
 ################################################################
+# Auth - Cognito
+################################################################
+module "auth" {
+  source = "./modules/auth"
+
+  resource_prefix = local.resource_prefix
+}
+
+################################################################
 # Etapa 4 — Mensajería (EventBridge + SQS + SNS)
 # Va antes que compute porque compute necesita los ARNs de aquí.
 ################################################################
@@ -88,6 +97,8 @@ module "frontend" {
   resource_prefix     = local.resource_prefix
   frontend_source_dir = "${path.root}/../frontend"
   api_url             = module.api.api_url
+  user_pool_id        = module.auth.user_pool_id
+  user_pool_client_id = module.auth.user_pool_client_id
 }
 
 ################################################################

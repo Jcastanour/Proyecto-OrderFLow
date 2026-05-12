@@ -61,6 +61,7 @@ locals {
     create_order        = "POST /orders"
     get_order_by_id     = "GET /orders/{orderId}"
     update_order_status = "PATCH /orders/{orderId}"
+    get_user_orders     = "GET /orders/user/{userEmail}"
   }
 
   # Etapa E: nuevas rutas

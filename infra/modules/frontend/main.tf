@@ -123,9 +123,9 @@ resource "aws_s3_object" "frontend_static_files" {
 resource "aws_s3_object" "frontend_env_js" {
   bucket       = aws_s3_bucket.frontend_site_bucket.id
   key          = "assets/scripts/env.js"
-  content      = "window.ENV = { API_URL: \"${var.api_url}\" };\n"
+  content      = "window.ENV = { API_URL: \"${var.api_url}\", USER_POOL_ID: \"${var.user_pool_id}\", CLIENT_ID: \"${var.user_pool_client_id}\" };\n"
   content_type = "application/javascript"
-  etag         = md5("window.ENV = { API_URL: \"${var.api_url}\" };\n")
+  etag         = md5("window.ENV = { API_URL: \"${var.api_url}\", USER_POOL_ID: \"${var.user_pool_id}\", CLIENT_ID: \"${var.user_pool_client_id}\" };\n")
 
   # Se aplica DESPUÉS de la subida masiva: si frontend/assets/scripts/env.js
   # existe localmente como placeholder, este lo sobrescribe con la URL real.

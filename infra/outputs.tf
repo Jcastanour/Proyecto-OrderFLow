@@ -3,6 +3,17 @@ output "orders_table_name" {
   value       = module.data.orders_table_name
 }
 
+output "user_pool_id" {
+  description = "ID del User Pool de Cognito."
+  value       = module.auth.user_pool_id
+}
+
+output "user_pool_client_id" {
+  description = "ID del App Client del User Pool de Cognito."
+  value       = module.auth.user_pool_client_id
+}
+
+
 output "products_table_name" {
   description = "Nombre de la tabla de productos (la usará el workflow para el seed)."
   value       = module.data.products_table_name

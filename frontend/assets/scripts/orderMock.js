@@ -115,6 +115,7 @@ export const OrderAdapter = {
         const nuevo = {
             orderId: generarOrderId(),
             cliente: pedidoData.cliente,
+            userEmail: pedidoData.userEmail || "anonimo@anonimo.com",
             items: pedidoData.items,
             total: pedidoData.totalPagadoOPCIONAL || 0,
             estado: 'Recibido',
@@ -129,6 +130,12 @@ export const OrderAdapter = {
     obtenerPedidos: async () => {
         await delay(300);
         return { status: 'success', data: [...dbPedidos] };
+    },
+
+    // GET /orders/user/{email}
+    obtenerMisPedidos: async (email) => {
+        await delay(300);
+        return { status: 'success', data: dbPedidos.filter(p => p.userEmail === email) };
     },
 
     // PATCH /orders/{orderId}

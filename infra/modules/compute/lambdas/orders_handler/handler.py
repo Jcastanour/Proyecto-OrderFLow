@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 from decimal import Decimal
 
 import boto3
+from boto3.dynamodb.conditions import Key
 from botocore.exceptions import ClientError
 
 ORDERS_TABLE_NAME = os.environ["ORDERS_TABLE_NAME"]
@@ -84,9 +85,12 @@ def crear_pedido(body):
     if not body.get("customer") or not isinstance(body.get("items"), list):
         return respuesta_error("customer e items son requeridos")
 
+    user_email = body.get("userEmail") or "anonimo@anonimo.com"
+
     pedido = {
         "orderId": str(uuid.uuid4()),
         "customer": body["customer"],
+        "userEmail": user_email,
         "items": body["items"],
         "total": Decimal(str(body.get("total", 0))),
         "status": "Recibido",
@@ -99,6 +103,13 @@ def crear_pedido(body):
     orders_table.put_item(Item=pedido)
     publicar_evento("OrderCreated", pedido)
     return respuesta_ok(pedido, status_code=201)
+
+def obtener_pedidos_usuario(user_email):
+    resultado = orders_table.query(
+        IndexName="UserEmailIndex",
+        KeyConditionExpression=Key("userEmail").eq(user_email)
+    )
+    return respuesta_ok(resultado.get("Items", []))
 
 
 def listar_pedidos():
@@ -177,6 +188,7 @@ def lambda_handler(event, _context):
     metodo_http = event.get("requestContext", {}).get("http", {}).get("method")
     ruta = event.get("requestContext", {}).get("http", {}).get("path", "")
     order_id = (event.get("pathParameters") or {}).get("orderId")
+    user_email = (event.get("pathParameters") or {}).get("userEmail")
     body = json.loads(event["body"]) if event.get("body") else {}
 
     try:
@@ -184,6 +196,8 @@ def lambda_handler(event, _context):
             return crear_pedido(body)
         if metodo_http == "GET" and ruta == "/orders":
             return listar_pedidos()
+        if metodo_http == "GET" and ruta.startswith("/orders/user/") and user_email:
+            return obtener_pedidos_usuario(user_email)
         if metodo_http == "GET" and order_id:
             return obtener_pedido(order_id)
         if metodo_http == "PATCH" and order_id:

@@ -26,6 +26,17 @@ resource "aws_dynamodb_table" "orders" {
     name = "orderId"
     type = "S"
   }
+
+  attribute {
+    name = "userEmail"
+    type = "S"
+  }
+
+  global_secondary_index {
+    name               = "UserEmailIndex"
+    hash_key           = "userEmail"
+    projection_type    = "ALL"
+  }
 }
 
 ################################################################

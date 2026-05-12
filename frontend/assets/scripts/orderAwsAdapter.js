@@ -75,6 +75,7 @@ export const OrderAdapter = {
             customer:  pedidoFront.cliente,
             items:     pedidoFront.items,
             total:     pedidoFront.totalPagadoOPCIONAL ?? 0,
+            userEmail: pedidoFront.userEmail,
             // Etapa A: enviar dirección al backend
             direccion: pedidoFront.direccion ?? undefined
         };
@@ -88,6 +89,12 @@ export const OrderAdapter = {
     // GET /orders
     obtenerPedidos: async () => {
         const lista = await pedirJson(`${API_URL}/orders`);
+        return { status: 'success', data: mapearListaDesdeAws(lista) };
+    },
+
+    // GET /orders/user/{email}
+    obtenerMisPedidos: async (email) => {
+        const lista = await pedirJson(`${API_URL}/orders/user/${encodeURIComponent(email)}`);
         return { status: 'success', data: mapearListaDesdeAws(lista) };
     },
 

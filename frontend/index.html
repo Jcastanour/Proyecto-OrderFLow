@@ -32,6 +32,9 @@
                 <a href="index.html" class="activo">Inicio</a>
                 <a href="#misPedidos" id="navMisPedidos">Mis pedidos</a>
                 <a href="nosotros.html">Nosotros</a>
+                <a href="#" id="navLogin">Ingresar</a>
+                <span id="navUser" style="display:none; color:var(--cilantro); font-weight:600; margin-left: 10px;"></span>
+                <a href="#" id="navLogout" style="display:none;">Salir</a>
             </nav>
 
             <button type="button" class="btn-carrito" id="btnAbrirCarrito" aria-label="Abrir carrito">
@@ -200,6 +203,32 @@
                 </div>
                 <button type="button" class="modal-plato__btn-add" id="modalAgregar">Agregar al pedido</button>
             </div>
+        </div>
+    </div>
+
+    <!-- ════════════════ MODAL AUTH (Login / Register) ════════════════ -->
+    <div class="modal-overlay" id="authOverlay">
+        <div class="modal-plato" style="max-width: 400px; padding: 24px;" role="dialog" aria-label="Ingresar a tu cuenta">
+            <button class="modal-plato__cerrar" id="cerrarAuth" aria-label="Cerrar">×</button>
+            <h2 id="authTitulo" style="margin-bottom: 20px;">Ingresar</h2>
+            <form id="authForm">
+                <div class="campo" id="authNameField" style="display:none;">
+                    <label>Nombre</label>
+                    <input type="text" id="authName" placeholder="Tu nombre">
+                </div>
+                <div class="campo">
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="authEmail" required placeholder="tu@correo.com">
+                </div>
+                <div class="campo">
+                    <label>Contraseña</label>
+                    <input type="password" id="authPassword" required placeholder="Min. 6 caracteres">
+                </div>
+                <button type="submit" class="btn-primario" id="authBtnSubmit" style="width:100%; margin-top:10px;">Ingresar</button>
+                <div style="margin-top: 15px; text-align: center; font-size: 0.9rem;">
+                    <a href="#" id="authToggleMode">¿No tienes cuenta? Regístrate</a>
+                </div>
+            </form>
         </div>
     </div>
 
