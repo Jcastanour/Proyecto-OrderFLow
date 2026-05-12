@@ -17,6 +17,7 @@ let pollingTimers = new Map();           // orderId -> intervalId
 
 // ═══════════════ Estado global Auth ═══════════════
 let authModoRegistro = false;
+let authModoConfirmacion = false;
 let loggedInUser = null;
 const COGNITO_URL = 'https://cognito-idp.us-east-1.amazonaws.com/';
 
@@ -490,7 +491,30 @@ async function procesarAuth(e) {
             return;
         }
 
-        if (authModoRegistro) {
+        if (authModoConfirmacion) {
+            const code = $('authCode').value.trim();
+            const payload = {
+                ClientId: clientId,
+                Username: email,
+                ConfirmationCode: code
+            };
+            const res = await fetch(COGNITO_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-amz-json-1.1', 'X-Amz-Target': 'AWSCognitoIdentityProviderService.ConfirmSignUp' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Error verificando el código');
+            
+            mostrarToast('Cuenta verificada con éxito. Iniciando...', 'exito');
+            authModoConfirmacion = false;
+            authModoRegistro = false;
+            $('authCode').value = '';
+            $('authCodeField').style.display = 'none';
+            $('authCode').required = false;
+            // No hacemos return para que continúe e inicie sesión automáticamente
+            
+        } else if (authModoRegistro) {
             const name = $('authName').value.trim();
             const payload = {
                 ClientId: clientId,
@@ -506,8 +530,15 @@ async function procesarAuth(e) {
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || 'Error registrando usuario');
             
-            mostrarToast('Cuenta creada. Iniciando sesión...', 'exito');
-            authModoRegistro = false;
+            mostrarToast('Revisa tu correo y digita el código.', 'exito');
+            
+            authModoConfirmacion = true;
+            $('authTitulo').textContent = 'Verificar correo';
+            $('authBtnSubmit').textContent = 'Confirmar código';
+            $('authNameField').style.display = 'none';
+            $('authCodeField').style.display = 'block';
+            $('authCode').required = true;
+            return;
         }
 
         const payload = {
@@ -521,7 +552,19 @@ async function procesarAuth(e) {
             body: JSON.stringify(payload)
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Credenciales inválidas');
+        if (!res.ok) {
+            if (data.message === 'User is not confirmed.' || data.__type === 'UserNotConfirmedException') {
+                authModoConfirmacion = true;
+                $('authTitulo').textContent = 'Verificar correo';
+                $('authBtnSubmit').textContent = 'Confirmar código';
+                $('authNameField').style.display = 'none';
+                $('authCodeField').style.display = 'block';
+                $('authCode').required = true;
+                mostrarToast('Debes verificar tu correo primero.', 'error');
+                return;
+            }
+            throw new Error(data.message || 'Credenciales inválidas');
+        }
 
         const idToken = data.AuthenticationResult.IdToken;
         const payloadDecoded = JSON.parse(atob(idToken.split('.')[1]));
@@ -599,13 +642,17 @@ function initAuth() {
     if ($('authToggleMode')) {
         $('authToggleMode').addEventListener('click', (e) => {
             e.preventDefault();
+            authModoConfirmacion = false;
             authModoRegistro = !authModoRegistro;
             $('authTitulo').textContent = authModoRegistro ? 'Crear cuenta' : 'Ingresar';
             $('authBtnSubmit').textContent = authModoRegistro ? 'Registrarme' : 'Ingresar';
             $('authToggleMode').textContent = authModoRegistro ? '¿Ya tienes cuenta? Ingresa' : '¿No tienes cuenta? Regístrate';
-            $('authNameField').style.display = authModoRegistro ? 'block' : 'none';
-            if (authModoRegistro) $('authName').required = true;
-            else $('authName').required = false;
+            
+            if ($('authNameField')) $('authNameField').style.display = authModoRegistro ? 'block' : 'none';
+            if ($('authName')) $('authName').required = authModoRegistro;
+            
+            if ($('authCodeField')) $('authCodeField').style.display = 'none';
+            if ($('authCode')) $('authCode').required = false;
         });
     }
 
