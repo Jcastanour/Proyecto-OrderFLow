@@ -20,49 +20,39 @@ Tres roles, una sola plataforma:
 
 ## 🏗️ Arquitectura
 
-```
-                       ┌────────────────────────────────────────┐
-                       │              Frontend                  │
-                       │  S3 (sitio estático)  ·  3 vistas      │
-                       └───────────────┬────────────────────────┘
-                                       │ HTTPS fetch
-                                       ▼
-                       ┌────────────────────────────────────────┐
-                       │     API Gateway HTTP (7 rutas)         │
-                       └────┬──────────┬──────────┬─────────────┘
-                            │          │          │
-                  ┌─────────▼──┐  ┌────▼─────┐  ┌─▼────────┐
-                  │  Lambda    │  │ Lambda   │  │ Lambda   │
-                  │  orders    │  │ products │  │ riders   │
-                  └───┬────┬───┘  └─────┬────┘  └─────┬────┘
-                      │    │            │             │
-                      │    │       ┌────▼──────┐ ┌────▼─────┐
-                      │    │       │ DynamoDB  │ │ DynamoDB │
-                      │    │       │ products  │ │ riders   │
-                      │    │       └───────────┘ └──────────┘
-                      │    │            │
-                      │    │       ┌────▼─────────┐
-                      │    │       │   S3 bucket  │
-                      │    │       │   imágenes   │
-                      │    │       └──────────────┘
-                      │    │
-              ┌───────▼┐   └──► EventBridge bus
-              │DynamoDB│              │
-              │ orders │              ▼
-              └────────┘         SQS notifications
-                                      │
-                                      ▼
-                              ┌──────────────────┐
-                              │ Lambda notifier  │
-                              └────────┬─────────┘
-                                       ▼
-                                  SNS → 📧 email
+![Arquitectura de OrderFlow en AWS](Docs/arquitectura.png)
 
-  Observabilidad: CloudWatch (12 alarmas + 1 dashboard con 8 widgets)
+100% **serverless** y **event-driven**, todo provisionado con Terraform:
+
+- **Acceso & Frontend** — CloudFront + S3 sirven el sitio estático; **Cognito (User Pool)** maneja el registro/login de usuarios.
+- **API** — API Gateway HTTP enruta a las Lambdas de negocio.
+- **Lógica de negocio (Compute)** — 4 Lambdas (`orders`, `products`, `riders`, `notifier`) en Python 3.12 sobre DynamoDB (orders, products, riders) y un bucket S3 de imágenes.
+- **Notificaciones (event-driven)** — los eventos de dominio van a **EventBridge → SQS → Lambda notifier → SNS → 📧 email**.
+- **Observabilidad** — CloudWatch con alarmas + dashboard.
+- **DevOps (CI/CD)** — GitHub Actions corre Terraform y despliega a la cuenta elegida (personal ↔ betek).
+
+<details>
+<summary>Ver el mismo flujo en ASCII</summary>
+
+```
+  Cliente ─► CloudFront/S3 ─► (Cognito login)
+                   │ HTTPS fetch
+                   ▼
+            API Gateway HTTP
+          ┌────────┼────────┐
+       orders   products   riders        (Lambdas Python 3.12)
+          │        │          │
+       DynamoDB  DynamoDB  DynamoDB  +  S3 imágenes
+       (orders)  (products)(riders)
+          │
+     EventBridge ─► SQS ─► Lambda notifier ─► SNS ─► 📧 email
+
+  Observabilidad: CloudWatch (alarmas + dashboard)
   CI/CD: GitHub Actions (deploy/destroy multi-cuenta personal ↔ betek)
 ```
+</details>
 
-Ver diagrama visual en [`Docs/diagrama-arquitectura.png`](Docs/diagrama-arquitectura.png) (prompt para generarlo: [`Docs/PROMPT_DIAGRAMA.md`](Docs/PROMPT_DIAGRAMA.md)).
+> El diagrama editable se mantiene en draw.io; el prompt usado para generarlo está en [`Docs/PROMPT_DIAGRAMA.md`](Docs/PROMPT_DIAGRAMA.md).
 
 ---
 
@@ -72,6 +62,8 @@ Ver diagrama visual en [`Docs/diagrama-arquitectura.png`](Docs/diagrama-arquitec
 |---|---|
 | **Lambda** (Python 3.12) | 4 funciones: `orders`, `notifier`, `products`, `riders` |
 | **API Gateway HTTP** | 7 rutas REST (`/orders`, `/products`, `/riders`) |
+| **Cognito** | User Pool + client para registro/login de usuarios |
+| **CloudFront** | CDN delante del sitio estático en S3 |
 | **DynamoDB** | 3 tablas on-demand: `orders`, `products`, `riders` |
 | **S3** | 3 buckets: state Terraform, sitio web, imágenes de comida |
 | **EventBridge** | Bus central de eventos de dominio |
@@ -111,7 +103,8 @@ infra/                  ← TODA la infraestructura (Terraform modular)
     ├── api/            — API Gateway HTTP + rutas + integraciones
     ├── messaging/      — EventBridge bus + SQS + SNS
     ├── images/         — Bucket S3 público de imágenes
-    ├── frontend/       — Bucket S3 + website hosting del sitio
+    ├── auth/           — Cognito User Pool + client (login)
+    ├── frontend/       — Bucket S3 + CloudFront + website hosting
     └── observability/  — Alarmas CloudWatch + Dashboard
 
 frontend/               ← El sitio (3 vistas)
@@ -123,6 +116,13 @@ frontend/               ← El sitio (3 vistas)
 
 images/                 ← FUENTE DE VERDAD de las imágenes de comida
                           (se suben automáticamente al bucket S3 en cada deploy)
+
+scripts/                ← Utilidades operativas (ver sección abajo)
+├── load_test.py        — Generador de carga contra el API
+├── load_test_ramp.py   — Carga en rampa (escalonada)
+└── watch_orderflow.py  — Dashboard en vivo en terminal
+
+Docs/                   ← Diagrama, planes, contexto y requisitos del proyecto
 ```
 
 ---
@@ -207,6 +207,23 @@ python3 -m http.server 8000
 Abrí `http://localhost:8000/index.html`. Como `window.ENV.API_URL` está vacío, el frontend usa el adapter mock con los datos en memoria.
 
 Para sumar una imagen nueva en modo mock, copiala a `frontend/assets/img/{slug}.{ext}`. Para producción, la fuente de verdad es `/images/` raíz (el workflow hace `aws s3 sync` desde ahí al bucket S3).
+
+---
+
+## 📊 Scripts de carga y monitoreo
+
+Utilidades en `scripts/` para probar y observar el sistema en vivo (requieren `pip install requests boto3`):
+
+```bash
+# Pruebas de carga contra el API (70% lecturas, 20% lectura puntual, 10% escritura)
+python3 scripts/load_test.py --api-url https://<api_url> --total 500 --concurrency 50
+
+# Carga en rampa (escala la concurrencia por etapas)
+python3 scripts/load_test_ramp.py --api-url https://<api_url>
+
+# Dashboard en vivo en la terminal (pedidos por estado, invocaciones/errores Lambda, SQS)
+python3 scripts/watch_orderflow.py
+```
 
 ---
 

@@ -213,6 +213,10 @@ __marimo__/
 # Backups de scripts (sed -i.bak)
 *.bak
 
+# Artefactos de build de las Lambdas (Terraform los regenera en cada apply)
+.build/
+*.zip
+
 # Entorno de desarrollo Claude / agentes locales
 .agents/
 skills-lock.json
