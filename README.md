@@ -52,8 +52,6 @@ Tres roles, una sola plataforma:
 ```
 </details>
 
-> El diagrama editable se mantiene en draw.io; el prompt usado para generarlo está en [`Docs/PROMPT_DIAGRAMA.md`](Docs/PROMPT_DIAGRAMA.md).
-
 ---
 
 ## 🧱 Stack AWS
